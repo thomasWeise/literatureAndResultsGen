@@ -1,0 +1,20 @@
+Package: literatureAndResultsGen
+Type: Package
+Title: A code/data generator package that can be used to build and validate code and data for R packages for presenting literature and results.
+Version: 0.8.0
+Author: Dr. Thomas Weise <tweise@hfuu.edu.cn>
+Maintainer: Dr. Thomas Weise <tweise@hfuu.edu.cn>
+Description: With this package, we evaluate the JSSP results.
+License: GPL-3
+Encoding: UTF-8
+Imports: bibtex (>= 0.4.2),
+         utils (>= 3.5.2)
+Suggests: devtools (>= 2.0.2),
+          roxygen2 (>= 6.1.1),
+          testthat (>= 2.1.1),
+          usethis (>= 1.5.0)
+Depends: R (>= 3.5.0)
+Remotes: github::romainfrancois/bibtex
+ByteCompile: true
+LazyData: true
+RoxygenNote: 6.1.1
