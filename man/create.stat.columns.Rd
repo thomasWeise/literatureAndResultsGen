@@ -4,22 +4,22 @@
 \alias{create.stat.columns}
 \title{Create Names and Conditions for Statistics Columns}
 \usage{
-create.stat.columns(title, description, number.column = "n.runs",
-  is.col.integer = FALSE, lower.bound = 0L,
-  upper.bound = NA_integer_)
+create.stat.columns(title, description, is.col.integer = FALSE,
+  lower.bound = 0L, upper.bound = NA_integer_,
+  n.runs.col = .col.n.runs)
 }
 \arguments{
 \item{title}{the variable name}
 
 \item{description}{the variable description}
 
-\item{number.column}{the name of the column with the number of repetitions}
-
 \item{is.col.integer}{is the variable/column integer valued?}
 
 \item{lower.bound}{an optional lower bound}
 
 \item{upper.bound}{an optional upper bound}
+
+\item{n.runs.col}{the name of the column with the number of repetitions}
 }
 \value{
 a list with the auto-generated members and code
