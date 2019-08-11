@@ -201,7 +201,52 @@ create.standard.columns <- function(are.objective.values.ints=TRUE,
                                            paste0("(!is.na(x$", .col.budget.fes, ") & (!is.na(x$",
                                                   cc$title, ")) & (x$", cc$title, " <= x$",
                                                   .col.budget.fes, "))") }, "")
-                                  ));
+                                  ),
+                     mergers=unlist(c(
+                       paste0("if(",
+                              "all(is.na(x$", total.fes$columns$min$title, ") | ((!is.na(x$",
+                              .col.budget.fes, ")) & (x$",
+                              total.fes$columns$min$title, " == x$", .col.budget.fes,
+                              "))) && ",
+                              "all(is.na(x$", total.fes$columns$mean$title, ") | ((!is.na(x$",
+                              .col.budget.fes, ")) & (x$",
+                              total.fes$columns$mean$title, " == x$", .col.budget.fes,
+                              "))) && ",
+                              "all(is.na(x$", total.fes$columns$med$title, ") | ((!is.na(x$",
+                              .col.budget.fes, ")) & (x$",
+                              total.fes$columns$med$title, " == x$", .col.budget.fes,
+                              "))) && ",
+                              "all(is.na(x$", total.fes$columns$mode$title, ") | ((!is.na(x$",
+                              .col.budget.fes, ")) & (x$",
+                              total.fes$columns$mode$title, " == x$", .col.budget.fes,
+                              "))) && ",
+                              "all(is.na(x$", total.fes$columns$max$title, ") | ((!is.na(x$",
+                              .col.budget.fes, ")) & (x$",
+                              total.fes$columns$max$title, " == x$", .col.budget.fes,
+                              "))) && ",
+                              "all(is.na(x$", total.fes$columns$sd$title, ") | ((!is.na(x$",
+                              .col.budget.fes, ")) & (x$",
+                              total.fes$columns$sd$title, "<=", 0,
+                              ")))",
+                              ") {"),
+                       unlist(lapply(list(total.fes$columns$min,
+                                       total.fes$columns$mean,
+                                       total.fes$columns$med,
+                                       total.fes$columns$mode,
+                                       total.fes$columns$max),
+                                     function(cc) {
+                                       t <- cc$title;
+                                       c(
+                                         paste0("  temp <- is.na(x$", t, ") & (!is.na(x$", .col.budget.fes, "));"),
+                                         paste0("  if(any(temp)) {"),
+                                         paste0("    changed <- TRUE;"),
+                                         paste0("    x$", t, "[temp] <- x$", .col.budget.fes, "[temp];"),
+                                         paste0("    x$", t, " <- force(x$", t, ");"),
+                                         paste0("  }")
+                                       );
+                                     })),
+                       "}"
+                     )));
 
   if(is.time.int) { t = "integer"; }
   else { t = "double"; }
@@ -226,7 +271,52 @@ create.standard.columns <- function(are.objective.values.ints=TRUE,
                                           function(cc) {
                                             paste0("(!is.na(x$", .col.budget.time, ") & (!is.na(x$",
                                                    cc$title, ")) & (x$", cc$title, " <= x$",
-                                                   .col.budget.time, "))") }, "")));
+                                                   .col.budget.time, "))") }, "")),
+                      mergers=unlist(c(
+                        paste0("if(",
+                               "all(is.na(x$", total.time$columns$min$title, ") | ((!is.na(x$",
+                               .col.budget.time, ")) & (x$",
+                               total.time$columns$min$title, " == x$", .col.budget.time,
+                               "))) && ",
+                               "all(is.na(x$", total.time$columns$mean$title, ") | ((!is.na(x$",
+                               .col.budget.time, ")) & (x$",
+                               total.time$columns$mean$title, " == x$", .col.budget.time,
+                               "))) && ",
+                               "all(is.na(x$", total.time$columns$med$title, ") | ((!is.na(x$",
+                               .col.budget.time, ")) & (x$",
+                               total.time$columns$med$title, " == x$", .col.budget.time,
+                               "))) && ",
+                               "all(is.na(x$", total.time$columns$mode$title, ") | ((!is.na(x$",
+                               .col.budget.time, ")) & (x$",
+                               total.time$columns$mode$title, " == x$", .col.budget.time,
+                               "))) && ",
+                               "all(is.na(x$", total.time$columns$max$title, ") | ((!is.na(x$",
+                               .col.budget.time, ")) & (x$",
+                               total.time$columns$max$title, " == x$", .col.budget.time,
+                               "))) && ",
+                               "all(is.na(x$", total.time$columns$sd$title, ") | ((!is.na(x$",
+                               .col.budget.time, ")) & (x$",
+                               total.time$columns$sd$title, "<=", 0,
+                               ")))",
+                               ") {"),
+                        unlist(lapply(list(total.time$columns$min,
+                                 total.time$columns$mean,
+                                 total.time$columns$med,
+                                 total.time$columns$mode,
+                                 total.time$columns$max),
+                        function(cc) {
+                          t <- cc$title;
+                          c(
+                            paste0("  temp <- is.na(x$", t, ") & (!is.na(x$", .col.budget.time, "));"),
+                            paste0("  if(any(temp)) {"),
+                            paste0("    changed <- TRUE;"),
+                            paste0("    x$", t, "[temp] <- x$", .col.budget.time, "[temp];"),
+                            paste0("    x$", t, " <- force(x$", t, ");"),
+                            paste0("  }")
+                          );
+                        })),
+                        "}"
+                      )));
 
 
   # merge
