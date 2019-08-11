@@ -42,6 +42,18 @@ create.column <- function(title,
     .check.column(col$title, col$description, col$type);
   }
   stopifnot(length(unique(vapply(columns, function(l) l$title, ""))) == length(columns));
+  if(length(conditions) > 0L) {
+    p <- parse(text=conditions);
+    stopifnot(all(is.language(p)),
+              all(!is.null(p)),
+              all(length(p) > 0L));
+  }
+  if(length(mergers) > 0L) {
+    p<-parse(text=paste(mergers, sep="\n", collapse="\n"));
+    stopifnot(is.language(p),
+              !is.null(p),
+              length(p) > 0L);
+  }
 }
 
 #' @title Create a Set of Column Descriptors along with Auto-Generated Code
@@ -49,7 +61,7 @@ create.column <- function(title,
 #' @param columns the column descriptors
 #' @param conditions the auto-generated validation code
 #' @param mergers the auto-generated merger code
-#' @param a set of column descriptors
+#' @return a set of column descriptors
 #' @export create.columns
 create.columns <- function(columns,
                            conditions=character(0),
@@ -66,8 +78,8 @@ create.columns <- function(columns,
 #' @description Merge the sets stemming from \code{create.columns}
 #' @param ... the columns
 #' @return the merged column sets
-#' @export merge.columns
-merge.columns <- function(...) {
+#' @export join.columns
+join.columns <- function(...) {
 
   all <- list(...);
   for(c in all) {

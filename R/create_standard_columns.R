@@ -48,20 +48,6 @@ create.standard.columns <- function(are.objective.values.ints=TRUE,
     time.bound <- 1E30;
   }
 
-  last.improvement.time <- create.stat.columns(
-    title=.col.last.improvement.time,
-    description="the time when the run made the last improvement, i.e., the time after which no further improvement was made, i.e., the time when the best solution was encountered during the run",
-    is.col.integer=is.time.int,
-    lower.bound=0L,
-    upper.bound=time.bound);
-
-  last.improvement.fes <- create.stat.columns(
-    title=.col.last.improvement.fes,
-    description="the function evaluation (FE) at which the run made the last improvement, i.e., the FE after which no further improvement was made, i.e., the FE when the best solution was created during the run, i.e., the exact number of solutions created until the best solution was found in the run",
-    is.col.integer=TRUE,
-    lower.bound=0L,
-    upper.bound=.int.bound);
-
   total.time <- create.stat.columns(
     title=.col.total.time,
     description="the total consumed runtime of the run, i.e., the time until the run was terminated",
@@ -75,6 +61,44 @@ create.standard.columns <- function(are.objective.values.ints=TRUE,
     is.col.integer=TRUE,
     lower.bound=0L,
     upper.bound=.int.bound);
+
+  last.improvement.time <- create.stat.columns(
+    title=.col.last.improvement.time,
+    description="the time when the run made the last improvement, i.e., the time after which no further improvement was made, i.e., the time when the best solution was encountered during the run",
+    is.col.integer=is.time.int,
+    lower.bound=0L,
+    upper.bound=time.bound);
+  last.improvement.time$conditons <- c(last.improvement.time$conditons,
+                                       vapply(seq_len(length(last.improvement.time$columns)-1L),
+                                              function(i) {
+                                                paste0("(!is.na(x$",
+                                                       last.improvement.time$columns[[i]]$title,
+                                                       ") & (!is.na(x$",
+                                                       total.time$columns[[i]]$title,
+                                                       ")) & (x$",
+                                                       last.improvement.time$columns[[i]]$title,
+                                                       " <= x$",
+                                                       total.time$columns[[i]]$title,
+                                                       "))") }, ""));
+
+  last.improvement.fes <- create.stat.columns(
+    title=.col.last.improvement.fes,
+    description="the function evaluation (FE) at which the run made the last improvement, i.e., the FE after which no further improvement was made, i.e., the FE when the best solution was created during the run, i.e., the exact number of solutions created until the best solution was found in the run",
+    is.col.integer=TRUE,
+    lower.bound=0L,
+    upper.bound=.int.bound);
+  last.improvement.fes$conditons <- c(last.improvement.fes$conditons,
+                                       vapply(seq_len(length(last.improvement.fes$columns)-1L),
+                                              function(i) {
+                                                paste0("(!is.na(x$",
+                                                       last.improvement.fes$columns[[i]]$title,
+                                                       ") & (!is.na(x$",
+                                                       total.fes$columns[[i]]$title,
+                                                       ")) & (x$",
+                                                       last.improvement.fes$columns[[i]]$title,
+                                                       " <= x$",
+                                                       total.fes$columns[[i]]$title,
+                                                       "))") }, ""));
 
   n.reach.best.f.min.runs <- create.columns(
                                   columns=list(create.column(title=.col.n.reach.best.f.min.runs,
@@ -98,6 +122,29 @@ create.standard.columns <- function(are.objective.values.ints=TRUE,
     lower.bound=0L,
     upper.bound=time.bound,
     n.runs.col=.col.n.reach.best.f.min.runs);
+  reach.best.f.min.time$conditons <- c(reach.best.f.min.time$conditons,
+                                      vapply(reach.best.f.min.time$columns[-length(reach.best.f.min.time$columns)],
+                                             function(cc) {
+                                               paste0("(!is.na(x$",
+                                                      cc$title,
+                                                      ") & (!is.na(x$",
+                                                      total.time$columns$max$title,
+                                                      ")) & (x$",
+                                                      cc$title,
+                                                      " <= x$",
+                                                      total.time$columns$max$title,
+                                                      "))") }, ""),
+                                      vapply(reach.best.f.min.time$columns[-length(reach.best.f.min.time$columns)],
+                                             function(cc) {
+                                               paste0("(!is.na(x$",
+                                                      cc$title,
+                                                      ") & (!is.na(x$",
+                                                      last.improvement.time$columns$max$title,
+                                                      ")) & (x$",
+                                                      cc$title,
+                                                      " <= x$",
+                                                      last.improvement.time$columns$max$title,
+                                                      "))") }, ""));
 
   reach.best.f.min.fes <- create.stat.columns(
     title=.col.reach.best.f.min.fes,
@@ -108,6 +155,29 @@ create.standard.columns <- function(are.objective.values.ints=TRUE,
     lower.bound=0L,
     upper.bound=.int.bound,
     n.runs.col=.col.n.reach.best.f.min.runs);
+  reach.best.f.min.fes$conditons <- c(reach.best.f.min.fes$conditons,
+                                       vapply(reach.best.f.min.fes$columns[-length(reach.best.f.min.fes$columns)],
+                                              function(cc) {
+                                                paste0("(!is.na(x$",
+                                                       cc$title,
+                                                       ") & (!is.na(x$",
+                                                       total.fes$columns$max$title,
+                                                       ")) & (x$",
+                                                       cc$title,
+                                                       " <= x$",
+                                                       total.fes$columns$max$title,
+                                                       "))") }, ""),
+                                       vapply(reach.best.f.min.fes$columns[-length(reach.best.f.min.fes$columns)],
+                                              function(cc) {
+                                                paste0("(!is.na(x$",
+                                                       cc$title,
+                                                       ") & (!is.na(x$",
+                                                       last.improvement.fes$columns$max$title,
+                                                       ")) & (x$",
+                                                       cc$title,
+                                                       " <= x$",
+                                                       last.improvement.fes$columns$max$title,
+                                                       "))") }, ""));
 
 
   budget.fes <- create.columns(columns=list(
@@ -115,7 +185,23 @@ create.standard.columns <- function(are.objective.values.ints=TRUE,
                                    "the maximum number of function evaluations a run was allowed to perform until forceful termination",
                                    "integer")),
                      conditions=c(.numeric.conditions(.col.budget.fes, TRUE),
-                                  .bound.conditions(.col.budget.fes, TRUE, 1L)));
+                                  .bound.conditions(.col.budget.fes, TRUE, 1L),
+                                  vapply(last.improvement.fes$columns[-length(last.improvement.fes$columns)],
+                                         function(cc) {
+                                           paste0("(!is.na(x$", .col.budget.fes, ") & (!is.na(x$",
+                                                  cc$title, ")) & (x$", cc$title, " <= x$",
+                                                  .col.budget.fes, "))") }, ""),
+                                  vapply(reach.best.f.min.fes$columns[-length(reach.best.f.min.fes$columns)],
+                                         function(cc) {
+                                           paste0("(!is.na(x$", .col.budget.fes, ") & (!is.na(x$",
+                                                  cc$title, ")) & (x$", cc$title, " <= x$",
+                                                  .col.budget.fes, "))") }, ""),
+                                  vapply(total.fes$columns[-length(total.fes$columns)],
+                                         function(cc) {
+                                           paste0("(!is.na(x$", .col.budget.fes, ") & (!is.na(x$",
+                                                  cc$title, ")) & (x$", cc$title, " <= x$",
+                                                  .col.budget.fes, "))") }, "")
+                                  ));
 
   if(is.time.int) { t = "integer"; }
   else { t = "double"; }
@@ -125,11 +211,26 @@ create.standard.columns <- function(are.objective.values.ints=TRUE,
                                     t)),
                       conditions=c(.numeric.conditions(.col.budget.time, is.time.int),
                                    .bound.conditions(.col.budget.time, is.time.int,
-                                                     0L, time.bound)));
+                                                     0L, time.bound),
+                                   vapply(last.improvement.time$columns[-length(last.improvement.time$columns)],
+                                          function(cc) {
+                                            paste0("(!is.na(x$", .col.budget.time, ") & (!is.na(x$",
+                                                   cc$title, ")) & (x$", cc$title, " <= x$",
+                                                   .col.budget.time, "))") }, ""),
+                                   vapply(reach.best.f.min.time$columns[-length(reach.best.f.min.time$columns)],
+                                          function(cc) {
+                                            paste0("(!is.na(x$", .col.budget.time, ") & (!is.na(x$",
+                                                   cc$title, ")) & (x$", cc$title, " <= x$",
+                                                   .col.budget.time, "))") }, ""),
+                                   vapply(total.time$columns[-length(total.time$columns)],
+                                          function(cc) {
+                                            paste0("(!is.na(x$", .col.budget.time, ") & (!is.na(x$",
+                                                   cc$title, ")) & (x$", cc$title, " <= x$",
+                                                   .col.budget.time, "))") }, "")));
 
 
   # merge
-  return(merge.columns(n.runs,
+  return(join.columns(n.runs,
               best.f,
               last.improvement.time,
               last.improvement.fes,

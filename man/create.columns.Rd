@@ -13,8 +13,9 @@ create.columns(columns, conditions = character(0),
 \item{conditions}{the auto-generated validation code}
 
 \item{mergers}{the auto-generated merger code}
-
-\item{a}{set of column descriptors}
+}
+\value{
+a set of column descriptors
 }
 \description{
 Well, create such a set.

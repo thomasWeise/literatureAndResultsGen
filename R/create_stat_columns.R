@@ -194,7 +194,7 @@ create.stat.columns <- function(title, description,
          );
 
   .merge.for.num.1 <- function(from, to) {
-    c(paste0("if(any(!is.na(to))) {"),
+    c(paste0("if(any(!is.na(", to, "))) {"),
       paste0("  temp <- ((!is.na(x$", n.runs.col, ")) & (x$", n.runs.col,
              " == 1L) & (!is.na(x$", from, ")) & is.na(x$",
              to, "));"),
@@ -207,7 +207,7 @@ create.stat.columns <- function(title, description,
   };
 
   .merge.for.sd.0 <- function(from, to) {
-    c(paste0("if(any(!is.na(to))) {"),
+    c(paste0("if(any(!is.na(", to, "))) {"),
       paste0("  temp <- ((!is.na(x$", sd.title, ")) & (x$", sd.title,
              " <= 0) & (!is.na(x$", from, ")) & is.na(x$",
              to, "));"),
