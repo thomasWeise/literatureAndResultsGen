@@ -1,10 +1,9 @@
 #' @title Create the Standard Meta-Data Column Set
 #' @description Create the set of standard meta-data columns
 #' @param are.objective.values.ints are objective values integers?
-#' @param is.time.int are time values integers?
 #' @param objective.value.lower.bound a hard lower bound for objective values
 #' @param objective.value.upper.bound a hard upper bound for objective values
-#' @return the set of standard columns
+#' @return the set of standard meta-data columns
 #' @include names.R
 #' @include create_stat_columns.R
 #' @export create.standard.meta.columns
@@ -13,6 +12,7 @@
 create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
                                          objective.value.lower.bound=0L,
                                          objective.value.upper.bound=NA_integer_) {
+  old.options <- options(warn=2);
 
   algo.id <- create.column(.col.algo.id,
                            "the ID or short name of the algorithm used to solve the problem instance",
@@ -39,5 +39,6 @@ create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
                                 inst.opt.bound.lower=inst.opt.bound.lower,
                                 ref.id=ref.id));
   result <- force(result);
+  options(old.options);
   return(result);
 }

@@ -4,7 +4,7 @@
 #' @param is.time.int are time values integers?
 #' @param objective.value.lower.bound a hard lower bound for objective values
 #' @param objective.value.upper.bound a hard upper bound for objective values
-#' @return the set of standard columns
+#' @return the set of standard result columns
 #' @include names.R
 #' @include create_stat_columns.R
 #' @export create.standard.result.columns
@@ -14,6 +14,8 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                     is.time.int=TRUE,
                                     objective.value.lower.bound=0L,
                                     objective.value.upper.bound=NA_integer_) {
+
+  old.options <- options(warn=2);
   stopifnot(is.logical(are.objective.values.ints),
             length(are.objective.values.ints) == 1L,
             is.logical(is.time.int),
@@ -320,7 +322,7 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
 
 
   # merge
-  return(join.columns(n.runs,
+  result <- (join.columns(n.runs,
               best.f,
               last.improvement.time,
               last.improvement.fes,
@@ -331,4 +333,7 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
               reach.best.f.min.fes,
               budget.fes,
               budget.time));
+  result <- force(result);
+  options(old.options);
+  return(result);
 }

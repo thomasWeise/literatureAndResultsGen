@@ -2,6 +2,7 @@
 .check.column <- function(title,
                           description,
                           type) {
+  old.options <- options(warn=2);
   stopifnot(is.character(title),
             length(title) == 1L,
             nchar(title) > 0L,
@@ -11,6 +12,7 @@
             type %in% c("integer",
                         "double",
                         "character"));
+  options(old.options);
 }
 
 #' @title Create a Column Descriptor
@@ -23,13 +25,17 @@
 create.column <- function(title,
                           description,
                           type) {
+  old.options <- options(warn=2);
   .check.column(title, description, type);
-  return(list(title=title,
+  result <- (list(title=title,
               description=description,
               type=type));
+  options(old.options);
+  return(result);
 }
 
 .check.columns <- function(columns, conditions, mergers) {
+  old.options <- options(warn=2);
   stopifnot(is.list(columns),
             length(columns) > 0L,
             is.character(conditions),
@@ -54,6 +60,7 @@ create.column <- function(title,
               !is.null(p),
               length(p) > 0L);
   }
+  options(old.options);
 }
 
 #' @title Create a Set of Column Descriptors along with Auto-Generated Code
@@ -66,11 +73,13 @@ create.column <- function(title,
 create.columns <- function(columns,
                            conditions=character(0),
                            mergers=character(0)) {
+  old.options <- options(warn=2);
   .check.columns(columns, conditions, mergers);
   l <- (list(columns=columns,
              conditions=unique(conditions),
              mergers=mergers));
   .check.columns(l$columns, l$conditions, l$mergers);
+  options(old.options);
   return(l);
 }
 
@@ -80,6 +89,7 @@ create.columns <- function(columns,
 #' @return the merged column sets
 #' @export join.columns
 join.columns <- function(...) {
+  old.options <- options(warn=2);
 
   all <- list(...);
   for(c in all) {
@@ -92,8 +102,10 @@ join.columns <- function(...) {
   mergers    <- unlist(lapply(all, function(l) unname(unlist(l$mergers))));
 
   # combine
-  return(create.columns(columns = columns,
-                        conditions = conditions,
-                        mergers = mergers));
+  result <- create.columns(columns = columns,
+                           conditions = conditions,
+                           mergers = mergers);
 
+  options(old.options);
+  return(result);
 }

@@ -18,7 +18,7 @@ create.standard.result.columns(are.objective.values.ints = TRUE,
 \item{objective.value.upper.bound}{a hard upper bound for objective values}
 }
 \value{
-the set of standard columns
+the set of standard result columns
 }
 \description{
 Create the set of standard result (statistic) columns

@@ -14,11 +14,9 @@ create.standard.meta.columns(are.objective.values.ints = TRUE,
 \item{objective.value.lower.bound}{a hard lower bound for objective values}
 
 \item{objective.value.upper.bound}{a hard upper bound for objective values}
-
-\item{is.time.int}{are time values integers?}
 }
 \value{
-the set of standard columns
+the set of standard meta-data columns
 }
 \description{
 Create the set of standard meta-data columns

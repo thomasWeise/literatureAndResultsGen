@@ -17,10 +17,11 @@
 #' @include create_column.R
 #' @export create.stat.columns
 create.stat.columns <- function(title, description,
-                                 is.col.integer=FALSE,
-                                 lower.bound=0L,
-                                 upper.bound=NA_integer_,
-                                 n.runs.col=.col.n.runs) {
+                                is.col.integer=FALSE,
+                                lower.bound=0L,
+                                upper.bound=NA_integer_,
+                                n.runs.col=.col.n.runs) {
+  old.options <- options(warn=2);
   stopifnot(is.character(title),
             length(title) == 1L,
             nchar(title) > 0L,
@@ -309,5 +310,8 @@ create.stat.columns <- function(title, description,
               conditions = conditions,
               mergers = mergers);
 
+  all <- force(all);
+
+  options(old.options);
   return(all);
 }
