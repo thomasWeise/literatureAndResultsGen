@@ -1,3 +1,8 @@
+.col.ref.id <- "ref.id"
+.col.ref.type <- "ref.type";
+.col.ref.bibtex <- "ref.as.bibtex";
+.col.ref.text <- "ref.as.text";
+
 .col.n.runs <- "n.runs";
 
 .col.min.name <- "min";
@@ -19,3 +24,7 @@
 .col.n.reach.best.f.min.runs <- paste0("reach.best.f.", .col.min.name, ".runs");
 .col.budget.fes <- "budget.fes";
 .col.budget.time <- "budget.time";
+
+.col.algo.id <- "algo.id";
+.col.inst.id <- "inst.id";
+.col.inst.opt.bound.lower <- "inst.opt.bound.lower";

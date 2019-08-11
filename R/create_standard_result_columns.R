@@ -1,5 +1,5 @@
-#' @title Create the Standard Column Set
-#' @description Create the set of standard columns
+#' @title Create the Standard Result Column Set
+#' @description Create the set of standard result (statistic) columns
 #' @param are.objective.values.ints are objective values integers?
 #' @param is.time.int are time values integers?
 #' @param objective.value.lower.bound a hard lower bound for objective values
@@ -7,10 +7,10 @@
 #' @return the set of standard columns
 #' @include names.R
 #' @include create_stat_columns.R
-#' @export create.standard.columns
+#' @export create.standard.result.columns
 #' @include base_conditions.R
 #' @include create_column.R
-create.standard.columns <- function(are.objective.values.ints=TRUE,
+create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                     is.time.int=TRUE,
                                     objective.value.lower.bound=0L,
                                     objective.value.upper.bound=NA_integer_) {

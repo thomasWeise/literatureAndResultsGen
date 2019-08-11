@@ -10,13 +10,14 @@ read.bibliography(bib.file)
 \item{bib.file}{the file}
 }
 \value{
-a \code{data.frame} with four columns, namely \code{id}: the BibTeX
-  entry's ID, \code{type}: the BibTeX entry's entry type, \code{bibtex}: the
-  raw bibtex code, and \code{text} a formatted representation of the BibTeX
-  that can be copy-pasted into package documentations
+a \code{data.frame} with four columns, namely \code{ref.id}: the
+  BibTeX entry's ID, \code{ref.type}: the BibTeX entry's entry type,
+  \code{ref.as.bibtex}: the raw bibtex code, and \code{ref.as.text} a
+  formatted representation of the BibTeX that can be copy-pasted into package
+  documentations
 }
 \description{
 This function loads and parses a bibliography from the given
-  bibtex file and turns it into a data frame. The goal is to allow for
-  easy look-up and processing of BibTeX data along with an R package.
+  bibtex file and turns it into a data frame. The goal is to allow for easy
+  look-up and processing of BibTeX data along with an R package.
 }

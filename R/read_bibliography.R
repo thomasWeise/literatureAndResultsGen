@@ -1,15 +1,18 @@
 #' @title Generate a Bibliographic List from a BibTeX File
 #' @description This function loads and parses a bibliography from the given
-#'   bibtex file and turns it into a data frame. The goal is to allow for
-#'   easy look-up and processing of BibTeX data along with an R package.
+#'   bibtex file and turns it into a data frame. The goal is to allow for easy
+#'   look-up and processing of BibTeX data along with an R package.
 #' @param bib.file the file
-#' @return a \code{data.frame} with four columns, namely \code{id}: the BibTeX
-#'   entry's ID, \code{type}: the BibTeX entry's entry type, \code{bibtex}: the
-#'   raw bibtex code, and \code{text} a formatted representation of the BibTeX
-#'   that can be copy-pasted into package documentations
+#' @return a \code{data.frame} with four columns, namely \code{ref.id}: the
+#'   BibTeX entry's ID, \code{ref.type}: the BibTeX entry's entry type,
+#'   \code{ref.as.bibtex}: the raw bibtex code, and \code{ref.as.text} a
+#'   formatted representation of the BibTeX that can be copy-pasted into package
+#'   documentations
 #' @export read.bibliography
 #' @importFrom bibtex read.bib
+#' @include names.R
 read.bibliography <- function(bib.file) {
+  old.options <- options(warn=2);
   stopifnot(is.character(bib.file),
             length(bib.file) == 1L,
             nchar(bib.file) > 0L,
@@ -92,6 +95,9 @@ read.bibliography <- function(bib.file) {
   stopifnot(length(bib.text) > 0L,
             sum(nchar(bib.text)) > 0L);
 
+  # deal with unescaped % signs
+  bib.text <- gsub("([^\\])\\%", "\\1\\\\%", bib.text, fixed=FALSE);
+
   #detect entries
   expr <- "^\\s*\\@([a-zA-Z]+)\\{([a-zA-Z0-9,:_]+?)\\,\\s*$";
   entries <- grep(expr, bib.text);
@@ -156,7 +162,7 @@ read.bibliography <- function(bib.file) {
                       function(e) {
                         use <- gsub("\\_", "_", e, fixed=TRUE);
                         stopifnot(nchar(use) > 0L);
-                        use <- strsplit(use, "\\n", fixed=TRUE);
+                        use <- strsplit(use, "\n", fixed=TRUE);
                         stopifnot(length(use) == 1L);
                         use <- use[[1L]];
                         stopifnot(length(use) > 0L,
@@ -183,11 +189,10 @@ read.bibliography <- function(bib.file) {
   stopifnot(length(formatted) == length(entries),
             !file.exists(tempfile));
 
-  result <- data.frame(id=entries.names,
-                       type=as.factor(entries.types),
-                       bibtex=entries,
-                       text=formatted,
-                       stringsAsFactors = FALSE);
-
+  args <- list(entries.names, as.factor(entries.types), entries, formatted, FALSE);
+  names(args) <- c(.col.ref.id, .col.ref.type, .col.ref.bibtex, .col.ref.text, "stringsAsFactors");
+  result <- do.call(data.frame, args);
+  result <- force(result);
+  options(old.options);
   return(result);
 }
