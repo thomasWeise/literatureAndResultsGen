@@ -28,3 +28,6 @@
 .col.algo.id <- "algo.id";
 .col.inst.id <- "inst.id";
 .col.inst.opt.bound.lower <- "inst.opt.bound.lower";
+
+
+.func.result.data.frame.validate <- ".result.data.frame.validate";
