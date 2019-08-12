@@ -10,6 +10,7 @@
 #' @export create.standard.result.columns
 #' @include base_conditions.R
 #' @include create_column.R
+#' @include force.R
 create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                     is.time.int=TRUE,
                                     objective.value.lower.bound=0L,
@@ -243,7 +244,7 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                          paste0("  if(any(temp)) {"),
                                          paste0("    changed <- TRUE;"),
                                          paste0("    x$", t, "[temp] <- x$", .col.budget.fes, "[temp];"),
-                                         paste0("    x$", t, " <- force(x$", t, ");"),
+                                         .force("    ", paste0("x$", t), "x"),
                                          paste0("  }")
                                        );
                                      })),

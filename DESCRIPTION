@@ -21,6 +21,7 @@ RoxygenNote: 6.1.1
 Collate: 
     'base_conditions.R'
     'create_column.R'
+    'force.R'
     'names.R'
     'create_stat_columns.R'
     'create_standard_meta_columns.R'

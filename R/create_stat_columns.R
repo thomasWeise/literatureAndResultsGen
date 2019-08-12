@@ -15,6 +15,7 @@
 #' @include names.R
 #' @include base_conditions.R
 #' @include create_column.R
+#' @include force.R
 #' @export create.stat.columns
 create.stat.columns <- function(title, description,
                                 is.col.integer=FALSE,
@@ -202,7 +203,7 @@ create.stat.columns <- function(title, description,
       "  if(any(temp)) {",
       "    changed <- TRUE;",
       paste0("    x$", to, "[temp] <- x$", from, "[temp];"),
-      paste0("    x$", to, " <- force(x$", to, ");"),
+      .force("    ", paste0("x$", to), "x"),
       "  }",
       "}")
   };
@@ -215,7 +216,7 @@ create.stat.columns <- function(title, description,
       "  if(any(temp)) {",
       "    changed <- TRUE;",
       paste0("    x$", to, "[temp] <- x$", from, "[temp];"),
-      paste0("    x$", to, " <- force(x$", to, ");"),
+      .force("    ", paste0("x$", to), "x"),
       "  }",
       "}")
   };
@@ -227,7 +228,7 @@ create.stat.columns <- function(title, description,
       "  if(any(temp)) {",
       "    changed <- TRUE;",
       paste0("    x$", sd.title, "[temp] <- 0;"),
-      paste0("    x$", sd.title, " <- force(x$", sd.title, ");"),
+      .force("    ", paste0("x$", sd.title), "x"),
       "  }",
       "}")
   };
@@ -240,7 +241,7 @@ create.stat.columns <- function(title, description,
       "  if(any(temp)) {",
       "    changed <- TRUE;",
       paste0("    x$", to, "[temp] <- ", value, ";"),
-      paste0("    x$", to, " <- force(x$", to, ");"),
+      .force("    ", paste0("x$", to), "x"),
       "  }",
       "}")
   };

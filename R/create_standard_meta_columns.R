@@ -37,7 +37,18 @@ create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
   result <- create.columns(list(algo.id=algo.id,
                                 inst.id=inst.id,
                                 inst.opt.bound.lower=inst.opt.bound.lower,
-                                ref.id=ref.id));
+                                ref.id=ref.id),
+                           conditions = c(
+                             paste0("all(!is.na(x$", algo.id$title, "))"),
+                             paste0("is.character(x$", algo.id$title, ")"),
+                             paste0("all(nchar(x$", algo.id$title, ") > 0L)"),
+                             paste0("all(!is.na(x$", inst.id$title, "))"),
+                             paste0("is.character(x$", inst.id$title, ")"),
+                             paste0("all(nchar(x$", inst.id$title, ") > 0L)"),
+                             paste0("all(!is.na(x$", ref.id$title, "))"),
+                             paste0("is.character(x$", ref.id$title, ")"),
+                             paste0("all(nchar(x$", ref.id$title, ") > 0L)")
+                           ));
   result <- force(result);
   options(old.options);
   return(result);
