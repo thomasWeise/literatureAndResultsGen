@@ -31,3 +31,4 @@
 
 
 .func.result.data.frame.validate <- ".result.data.frame.validate";
+.func.result.data.frame.expand <- ".result.data.frame.expand";
