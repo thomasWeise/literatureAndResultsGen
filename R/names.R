@@ -1,5 +1,6 @@
 .col.ref.id <- "ref.id"
 .col.ref.type <- "ref.type";
+.col.ref.year <- "ref.year";
 .col.ref.bibtex <- "ref.as.bibtex";
 .col.ref.text <- "ref.as.text";
 

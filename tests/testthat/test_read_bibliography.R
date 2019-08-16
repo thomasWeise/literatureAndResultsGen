@@ -9,20 +9,24 @@ test_that("Test reading a default bibliography", {
   bib <- read.bibliography(bib.path);
   expect_true(is.data.frame(bib));
   expect_identical(nrow(bib), 177L);
-  expect_identical(ncol(bib), 4L);
-  expect_identical(colnames(bib), c("ref.id", "ref.type", "ref.as.bibtex", "ref.as.text"));
+  expect_identical(ncol(bib), 5L);
+  expect_identical(colnames(bib), c("ref.id", "ref.type", "ref.year", "ref.as.bibtex", "ref.as.text"));
   expect_type(bib[, 1L], "character");
   expect_type(bib[, 2L], "integer");
-  expect_type(bib[, 3L], "character");
+  expect_type(bib[, 3L], "integer");
   expect_type(bib[, 4L], "character");
+  expect_type(bib[, 5L], "character");
   expect_true(is.factor(bib[, 2L]));
   expect_true(all(nchar(bib[, 1L]) > 0L));
-  expect_true(all(nchar(bib[, 3L]) > 0L));
+  expect_true(all(bib[, 3L] > 1900L));
+  expect_true(all(bib[, 3L] < 3000L));
   expect_true(all(nchar(bib[, 4L]) > 0L));
+  expect_true(all(nchar(bib[, 5L]) > 0L));
   expect_false(any(is.na(bib[, 1L])));
   expect_false(any(is.na(bib[, 2L])));
   expect_false(any(is.na(bib[, 3L])));
   expect_false(any(is.na(bib[, 4L])));
+  expect_false(any(is.na(bib[, 5L])));
   expect_identical(length(unique(unname(unlist(bib[, 1L])))), 177L);
 })
 

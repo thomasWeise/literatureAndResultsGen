@@ -3,11 +3,11 @@
 #'   bibtex file and turns it into a data frame. The goal is to allow for easy
 #'   look-up and processing of BibTeX data along with an R package.
 #' @param bib.file the file
-#' @return a \code{data.frame} with four columns, namely \code{ref.id}: the
+#' @return a \code{data.frame} with five columns, namely \code{ref.id}: the
 #'   BibTeX entry's ID, \code{ref.type}: the BibTeX entry's entry type,
-#'   \code{ref.as.bibtex}: the raw bibtex code, and \code{ref.as.text} a
-#'   formatted representation of the BibTeX that can be copy-pasted into package
-#'   documentations
+#'   \code{ref.year}: the year of the entry, \code{ref.as.bibtex}: the raw
+#'   bibtex code, and \code{ref.as.text} a formatted representation of the
+#'   BibTeX that can be copy-pasted into package documentations
 #' @export read.bibliography
 #' @importFrom bibtex read.bib
 #' @include names.R
@@ -150,10 +150,23 @@ read.bibliography <- function(bib.file) {
   stopifnot(length(entries) == length(entries.names),
             all(nchar(entries) > 0L));
 
+  entries.years <- vapply(entries, function(e) {
+    e <- gsub("\\s+", "", e);
+    stopifnot(nchar(e) > 9L);
+    y <- gsub(".*[\\},]year=[\\{]?([0-9]+).*", "\\1", e);
+    stopifnot(nchar(y) == 4L);
+    y <- as.integer(y);
+    stopifnot(!is.na(y),
+               is.finite(y),
+               y > 1900L,
+               y < 3000L);
+    return(y);
+  }, NA_integer_)
 
-  order <- order(entries.names);
+  order <- order(entries.names, entries.years);
   entries.names <- entries.names[order];
   entries.types <- entries.types[order];
+  entries.years <- entries.years[order];
   entries <- entries[order];
 
   # format the entries
@@ -189,8 +202,8 @@ read.bibliography <- function(bib.file) {
   stopifnot(length(formatted) == length(entries),
             !file.exists(tempfile));
 
-  args <- list(entries.names, as.factor(entries.types), entries, formatted, FALSE);
-  names(args) <- c(.col.ref.id, .col.ref.type, .col.ref.bibtex, .col.ref.text, "stringsAsFactors");
+  args <- list(entries.names, as.factor(entries.types), entries.years, entries, formatted, FALSE);
+  names(args) <- c(.col.ref.id, .col.ref.type, .col.ref.year, .col.ref.bibtex, .col.ref.text, "stringsAsFactors");
   result <- do.call(data.frame, args);
   result <- force(result);
   options(old.options);
