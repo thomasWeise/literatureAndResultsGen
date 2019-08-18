@@ -21,13 +21,13 @@
   latex.name.base <- "article";
   latex.name <- paste0(latex.name.base, ".tex");
   latex.file <- file.path(temp.dir, latex.name);
-  latex.text <- c("\\documentclass[journal]{IEEEtran}%",
+  latex.text <- c("\\documentclass{article}%",
                   "\\begin{document}%",
                   "\\author{bla}%",
                   "\\title{bla}%",
                   "\\maketitle%",
                   "\\cite{*}%",
-                  "\\bibliographystyle{IEEEtran}%",
+                  "\\bibliographystyle{unsrt}%",
                   paste0("\\bibliography{", bibliography.name, "}%"),
                   "\\end{document}%",
                   "\\endinput%");
