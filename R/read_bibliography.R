@@ -11,8 +11,9 @@
   temp.dir <- normalizePath(temp.dir, mustWork = TRUE);
   stopifnot(dir.exists(temp.dir));
 
-  bibliography.name <- "bibliography.bib";
-  bibliography.dest <- file.path(temp.dir, bibliography.name);
+  bibliography <- unlist(c(unlist(bibliography), ""));
+
+  bibliography.dest <- file.path(temp.dir, "bibliography.bib");
   writeLines(text=bibliography,
              con=bibliography.dest);
   stopifnot(file.exists(bibliography.dest),
@@ -28,7 +29,7 @@
                   "\\maketitle%",
                   "\\cite{*}%",
                   "\\bibliographystyle{unsrt}%",
-                  paste0("\\bibliography{", bibliography.name, "}%"),
+                  paste0("\\bibliography{bibliography}%"),
                   "\\end{document}%",
                   "\\endinput%");
   latex.text <- force(latex.text);

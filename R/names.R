@@ -33,3 +33,4 @@
 
 .func.result.data.frame.validate <- ".result.data.frame.validate";
 .func.result.data.frame.expand <- ".result.data.frame.expand";
+.func.result.data.frame.load <- ".result.data.frame.load";
