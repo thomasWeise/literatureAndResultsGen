@@ -231,15 +231,18 @@ read.bibliography <- function(bib.file) {
   stopifnot(length(entries) == length(entries.names),
             all(sum(vapply(entries, function(i) sum(vapply(i, nchar, 0L)), 0L)) > 0L));
 
+# pipe everything through bibtex once, as sanity check
   .dummy <- "aBcs5G'+";
   .replace <- function(vv,ll) gsub(.dummy, paste0("\\", vv),
                               gsub(vv, paste0("\\", vv),
                               gsub(paste0("\\", vv), .dummy, ll, fixed=TRUE),
                               fixed=TRUE), fixed=TRUE);
-  l <- .replace("%",
-       .replace("&",
-       .replace("_", unlist(entries, recursive = TRUE))));
+  l <- .replace("%", .replace("&", .replace("_", unlist(entries, recursive = TRUE))));
   .temp.test.bib(l);
+  rm("l");
+  rm(".replace");
+  rm(".dummy");
+# done piping everything through bibtex once, as sanity check
 
   entries <- vapply(entries, function(i) paste(unlist(i), sep="\n", collapse="\n"), "");
   stopifnot(length(entries) == length(entries.names),
@@ -289,7 +292,7 @@ read.bibliography <- function(bib.file) {
                         read <- read[[1L]];
                         stopifnot(typeof(read) == "list",
                                   class(read) == "bibentry");
-                        read <- format(read, style="text");
+                        read <- suppressWarnings(format(read, style="text"));
                         stopifnot(length(read) == 1L,
                                   nchar(read) > 0L);
                         return(read);
