@@ -54,3 +54,21 @@ test_that("Test generate.result.data.frame.expand.function", {
   }
 })
 
+
+test_that("Test generate.result.data.frame.load.function", {
+  d <- generate.result.data.frame.load.function(
+          create.standard.meta.columns(),
+          create.standard.result.columns(),
+          "...tmpfunc");
+  t <- parse(text=paste(d, sep="\n", collapse="\n"));
+  expect_type(t, "expression");
+  if(exists("...tmpfunc")) {
+    rm("...tmpfunc");
+  }
+  eval(t);
+  expect_true(exists("...tmpfunc"));
+  expect_type(...tmpfunc, "closure");
+  expect_true(is.function(...tmpfunc));
+  rm("...tmpfunc");
+})
+
