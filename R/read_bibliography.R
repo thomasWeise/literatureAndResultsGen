@@ -1,3 +1,77 @@
+.temp.test.bib <- function(bibliography) {
+
+  ret <- system(paste0("pdflatex --version"));
+  if(ret != 0L) { return(FALSE); }
+  ret <- system(paste0("bibtex --version"));
+  if(ret != 0L) { return(FALSE); }
+
+  temp.dir <- tempfile();
+  stopifnot(!file.exists(temp.dir));
+  dir.create(path=temp.dir, recursive = TRUE);
+  temp.dir <- normalizePath(temp.dir, mustWork = TRUE);
+  stopifnot(dir.exists(temp.dir));
+
+  bibliography.name <- "bibliography.bib";
+  bibliography.dest <- file.path(temp.dir, bibliography.name);
+  writeLines(text=bibliography,
+             con=bibliography.dest);
+  stopifnot(file.exists(bibliography.dest),
+            file.size(bibliography.dest) >= (sum(nchar(bibliography))+length(bibliography)));
+
+  latex.name.base <- "article";
+  latex.name <- paste0(latex.name.base, ".tex");
+  latex.file <- file.path(temp.dir, latex.name);
+  latex.text <- c("\\documentclass[journal]{IEEEtran}%",
+                  "\\begin{document}%",
+                  "\\author{bla}%",
+                  "\\title{bla}%",
+                  "\\maketitle%",
+                  "\\cite{*}%",
+                  "\\bibliographystyle{IEEEtran}%",
+                  paste0("\\bibliography{", bibliography.name, "}%"),
+                  "\\end{document}%",
+                  "\\endinput%");
+  latex.text <- force(latex.text);
+
+  writeLines(text = latex.text,
+             con=latex.file);
+  stopifnot(file.exists(latex.file),
+            file.size(latex.file) >= sum(nchar(latex.text)) + length(latex.text));
+
+  pdflatex.args <- paste0("cd '", temp.dir, "' && pdflatex -halt-on-error -interaction=nonstopmode ", latex.name);
+  bibtex.args <- paste0("cd '", temp.dir, "' && bibtex ", latex.name.base);
+  stopifnot(system(pdflatex.args) == 0L);
+  stopifnot(system(bibtex.args) == 0L);
+  stopifnot(system(pdflatex.args) == 0L);
+  stopifnot(system(bibtex.args) == 0L);
+  stopifnot(system(pdflatex.args) == 0L);
+  stopifnot(system(bibtex.args) == 0L);
+  output <- system(intern=TRUE, paste0(bibtex.args, " 2>&1"));
+  stopifnot(attr(output, "status") == 0L);
+
+  stopifnot(length(output) > 0L,
+            sum(nchar(output)) > 0L);
+
+  warnings <- ((grepl("Warning--", output, fixed=TRUE) |
+                grepl("Error--", output, fixed=TRUE)) & ((!
+                grepl("Warning--edition", output, fixed=TRUE))));
+  if(any(warnings)) {
+    stop(paste(output[warnings], sep="\n", collapse="\n"));
+  }
+
+  stopifnot(file.exists(file.path(temp.dir, paste0(latex.name.base, ".pdf"))));
+  bbl.file <- file.path(temp.dir, paste0(latex.name.base, ".bbl"));
+  stopifnot(file.exists(bbl.file));
+
+  bibliography2 <- readLines(bbl.file);
+  bibliography2 <- force(bibliography2);
+  stopifnot(length(bibliography2) > 0L,
+            sum(nchar(bibliography2)) > 0L);
+
+  unlink(temp.dir, recursive = TRUE);
+}
+
+
 #' @title Generate a Bibliographic List from a BibTeX File
 #' @description This function loads and parses a bibliography from the given
 #'   bibtex file and turns it into a data frame. The goal is to allow for easy
@@ -73,6 +147,15 @@ read.bibliography <- function(bib.file) {
                                 paste0("\\1", use.val, "\\2"),
                                 bib.text[found]);
       }
+
+      expr <- paste0("(\\s*=\\s*)", use.name, "(\\s*\\#)");
+      found <- grep(expr, bib.text);
+      if(length(found) > 0L) {
+        bib.text[found] <- gsub(expr,
+                                paste0("\\1", use.val, "\\2"),
+                                bib.text[found]);
+      }
+
       expr <- paste0("(\\s*\\#\\s*)", use.name, "(\\s*\\#*)");
       found <- grep(expr, bib.text);
       if(length(found) > 0L) {
@@ -146,6 +229,17 @@ read.bibliography <- function(bib.file) {
 
   stopifnot(length(entries) == length(entries.names),
             all(sum(vapply(entries, function(i) sum(vapply(i, nchar, 0L)), 0L)) > 0L));
+
+  .dummy <- "aBcs5G'+";
+  .replace <- function(vv,ll) gsub(.dummy, paste0("\\", vv),
+                              gsub(vv, paste0("\\", vv),
+                              gsub(paste0("\\", vv), .dummy, ll, fixed=TRUE),
+                              fixed=TRUE), fixed=TRUE);
+  l <- .replace("%",
+       .replace("&",
+       .replace("_", unlist(entries, recursive = TRUE))));
+  .temp.test.bib(l);
+
   entries <- vapply(entries, function(i) paste(unlist(i), sep="\n", collapse="\n"), "");
   stopifnot(length(entries) == length(entries.names),
             all(nchar(entries) > 0L));
