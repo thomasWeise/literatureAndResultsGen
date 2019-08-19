@@ -311,7 +311,7 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                           t <- cc$title;
                           c(
                             paste0("  temp <- is.na(x$", t, ") & (!is.na(x$",
-                                     .col.budget.time, ")) & is.na(",
+                                     .col.budget.time, ")) & is.na(x$",
                                      .col.budget.fes, ");"),
                             paste0("  if(any(temp)) {"),
                             paste0("    changed <- TRUE;"),
@@ -357,7 +357,7 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                         t <- cc$title;
                                         c(
                                           paste0("  temp <- is.na(x$", t, ") & (!is.na(x$",
-                                                 .col.budget.fes, ")) & is.na(",
+                                                 .col.budget.fes, ")) & is.na(x$",
                                                  .col.budget.time, ");"),
                                           paste0("  if(any(temp)) {"),
                                           paste0("    changed <- TRUE;"),
