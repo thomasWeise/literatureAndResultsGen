@@ -11,7 +11,8 @@
             nchar(description) > 0L,
             type %in% c("integer",
                         "double",
-                        "character"));
+                        "character",
+                        "logical"));
   options(old.options);
 }
 

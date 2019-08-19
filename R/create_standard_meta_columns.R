@@ -39,15 +39,23 @@ create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
   system.cpu.name <- create.column(.col.system.cpu.name,
                                    "the name of the CPU of the system on which the experiment was run",
                                    "character");
+  system.cpu.n <- create.column(.col.system.cpu.n,
+                                "the number of CPUs used",
+                                "integer");
   system.cpu.cores <- create.column(.col.system.cpu.cores,
-                                    "the number of cores of the CPU",
+                                    "the number of cores of per CPU",
                                     "integer");
   system.cpu.threads <- create.column(.col.system.cpu.threads,
-                                      "the number of threads of the CPU",
+                                      "the number of threads of per CPU",
                                       "integer");
   system.cpu.mhz <- create.column(.col.system.cpu.mhz,
                                   "the clock speed of the CPU in MHz",
                                   "integer");
+
+  system.runs.are.parallel <- create.column(.col.system.runs.are.parallel,
+                                            "are the single runs making use of parallelization, i.e., do they use multiple threads?",
+                                            "logical");
+
   system.memory.mb <- create.column(.col.system.memory.mb,
                                     "the memory size of the system in MB",
                                     "integer");
@@ -73,9 +81,11 @@ create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
                                 inst.id=inst.id,
                                 inst.opt.bound.lower=inst.opt.bound.lower,
                                 system.cpu.name=system.cpu.name,
+                                system.cpu.n=system.cpu.n,
                                 system.cpu.cores=system.cpu.cores,
                                 system.cpu.threads=system.cpu.threads,
                                 system.cpu.mhz=system.cpu.mhz,
+                                system.runs.are.parallel=system.runs.are.parallel,
                                 system.memory.mb=system.memory.mb,
                                 system.os.name=system.os.name,
                                 system.vm.name=system.vm.name,
@@ -97,6 +107,9 @@ create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
 
                              paste0("all(is.character(x$", system.cpu.name$title, "))"),
                              paste0("all(is.na(x$", system.cpu.name$title, ") | (nchar(x$", system.cpu.name$title, ") > 0L))"),
+
+                             paste0("all(is.integer(x$", system.cpu.n$title, "))"),
+                             paste0("all(is.na(x$", system.cpu.n$title, ") | (is.finite(x$", system.cpu.n$title, ") & (x$", system.cpu.n$title, " > 0L)))"),
 
                              paste0("all(is.integer(x$", system.cpu.cores$title, "))"),
                              paste0("all(is.na(x$", system.cpu.cores$title, ") | (is.finite(x$", system.cpu.cores$title, ") & (x$", system.cpu.cores$title, " > 0L)))"),
@@ -123,7 +136,9 @@ create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
                              paste0("all(is.na(x$", system.programming.language.name$title, ") | (nchar(x$", system.programming.language.name$title, ") > 0L))"),
 
                              paste0("all(is.character(x$", system.external.tools.list$title, "))"),
-                             paste0("all(is.na(x$", system.external.tools.list$title, ") | (nchar(x$", system.external.tools.list$title, ") > 0L))")
+                             paste0("all(is.na(x$", system.external.tools.list$title, ") | (nchar(x$", system.external.tools.list$title, ") > 0L))"),
+
+                             paste0("all(is.logical(x$", system.runs.are.parallel$title, "))")
                            ));
   result <- force(result);
   options(old.options);

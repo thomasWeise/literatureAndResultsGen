@@ -30,12 +30,14 @@
 .col.inst.id <- "inst.id";
 .col.inst.opt.bound.lower <- "inst.opt.bound.lower";
 .col.system.cpu.name <- "system.cpu.name";
+.col.system.cpu.n <- "system.cpu.n";
 .col.system.cpu.cores <- "system.cpu.cores";
 .col.system.cpu.threads <- "system.cpu.threads";
 .col.system.cpu.mhz <- "system.cpu.mhz";
 .col.system.memory.mb <- "system.memory.mb";
 .col.system.os.name <- "system.os.name";
 .col.system.vm.name <- "system.vm.name";
+.col.system.runs.are.parallel <- "system.runs.are.parallel";
 .col.system.compiler.name <- "system.compiler.name";
 .col.system.programming.language.name <- "system.programming.language.name";
 .col.system.external.tools.list <- "system.external.tools.list";
