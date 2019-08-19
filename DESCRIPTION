@@ -1,6 +1,6 @@
 Package: literatureAndResultsGen
 Type: Package
-Title: A code/data generator package that can be used to build and validate code and data for R packages for presenting literature and results.
+Title: A code/data generator package that can be used to build and validate code and data for R packages for presenting literature and results
 Version: 0.8.0
 Author: Dr. Thomas Weise <tweise@hfuu.edu.cn>
 Maintainer: Dr. Thomas Weise <tweise@hfuu.edu.cn>
