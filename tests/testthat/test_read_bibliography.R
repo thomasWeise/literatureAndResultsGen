@@ -9,8 +9,8 @@ test_that("Test reading a default bibliography", {
   bib <- read.bibliography(bib.path);
   expect_true(is.data.frame(bib));
   expect_identical(nrow(bib), 177L);
-  expect_identical(ncol(bib), 5L);
-  expect_identical(colnames(bib), c("ref.id", "ref.type", "ref.year", "ref.as.bibtex", "ref.as.text"));
+  expect_identical(colnames(bib), c("ref.id", "ref.type", "ref.year", "ref.as.bibtex",
+                                    "ref.as.text"));
   expect_type(bib[, 1L], "character");
   expect_type(bib[, 2L], "integer");
   expect_type(bib[, 3L], "integer");

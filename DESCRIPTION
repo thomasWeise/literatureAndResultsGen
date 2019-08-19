@@ -27,4 +27,5 @@ Collate:
     'create_standard_meta_columns.R'
     'create_standard_result_columns.R'
     'generate_result_data_frame_functions.R'
+    'make_r_doc_references.R'
     'read_bibliography.R'

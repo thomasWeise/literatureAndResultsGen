@@ -267,7 +267,7 @@ read.bibliography <- function(bib.file) {
   entries.years <- entries.years[order];
   entries <- entries[order];
 
-  # format the entries
+  # format the entries as text
   tempfile <- tempfile(fileext=".bib");
   formatted <- vapply(entries,
                       function(e) {
@@ -295,13 +295,34 @@ read.bibliography <- function(bib.file) {
                         read <- suppressWarnings(format(read, style="text"));
                         stopifnot(length(read) == 1L,
                                   nchar(read) > 0L);
+
+                        read <- gsub("\n", " ", read, fixed=TRUE);
+                        read <- gsub("\\'i", "í", read, fixed=TRUE);
+                        l1 <- nchar(read);
+                        read <- sub("\\_(.+?)\\_\\,", "\\1\\,", read, fixed=FALSE);
+                        l2 <- nchar(read);
+                        if(l1 >= l2) {
+                          read <- sub("\\_(.+?)\\_\\.", "\\1\\.", read, fixed=FALSE);
+                        } else {
+                          l1 <- l2;
+                        }
+                        read <- sub("\\*(.+?)\\*\\,", "\\1\\,", read, fixed=FALSE);
+                        l2 <- nchar(read);
+                        if(l1 >= l2) {
+                          read <- sub("\\*(.+?)\\*\\(", "\\1\\(", read, fixed=FALSE);
+                        } else {
+                          l1 <- l2;
+                        }
+                        read <- gsub("([a-zA-Z0-9])~([0-9])", "\\1 \\2", read, fixed=FALSE);
                         return(read);
                       }, "");
   stopifnot(length(formatted) == length(entries),
             !file.exists(tempfile));
 
-  args <- list(entries.names, as.factor(entries.types), entries.years, entries, formatted, FALSE);
-  names(args) <- c(.col.ref.id, .col.ref.type, .col.ref.year, .col.ref.bibtex, .col.ref.text, "stringsAsFactors");
+  args <- list(entries.names, as.factor(entries.types), entries.years, entries, formatted,
+               FALSE);
+  names(args) <- c(.col.ref.id, .col.ref.type, .col.ref.year, .col.ref.bibtex, .col.ref.text,
+                   "stringsAsFactors");
   result <- do.call(data.frame, args);
   result <- force(result);
   options(old.options);
