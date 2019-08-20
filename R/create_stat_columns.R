@@ -225,7 +225,7 @@ create.stat.columns <- function(title, description,
       "}")
   };
 
-  .fix.from.min.max <- function(to, value=paste0(min.title, "[temp]")) {
+  .fix.from.min.max <- function(to, value=paste0("x$", min.title, "[temp]")) {
     c(paste0("if(any(!is.na(x$", sd.title, "))) {"),
       paste0("  temp <- ((!is.na(x$", min.title, ")) & (!is.na(x$",
              max.title, ")) & (is.na(x$", to, ")) & (x$",
