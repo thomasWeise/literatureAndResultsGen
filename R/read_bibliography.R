@@ -314,6 +314,9 @@ read.bibliography <- function(bib.file) {
                           l1 <- l2;
                         }
                         read <- gsub("([a-zA-Z0-9])~([0-9])", "\\1 \\2", read, fixed=FALSE);
+                        read <- gsub("\\&", "&", read, fixed=TRUE);
+                        stopifnot(length(read) == 1L,
+                                  nchar(read) > 0L);
                         return(read);
                       }, "");
   stopifnot(length(formatted) == length(entries),

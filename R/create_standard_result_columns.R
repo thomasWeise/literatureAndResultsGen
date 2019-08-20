@@ -4,6 +4,8 @@
 #' @param is.time.int are time values integers?
 #' @param objective.value.lower.bound a hard lower bound for objective values
 #' @param objective.value.upper.bound a hard upper bound for objective values
+#' @param time.unit a description of how time is measured; by default
+#'                 \code{"measured in milliseconds"}
 #' @return the set of standard result columns
 #' @include names.R
 #' @include create_stat_columns.R
@@ -14,7 +16,8 @@
 create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                     is.time.int=TRUE,
                                     objective.value.lower.bound=0L,
-                                    objective.value.upper.bound=NA_integer_) {
+                                    objective.value.upper.bound=NA_integer_,
+                                    time.unit="measured in milliseconds") {
 
   old.options <- options(warn=2);
   stopifnot(is.logical(are.objective.values.ints),
@@ -53,7 +56,8 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
 
   total.time <- create.stat.columns(
     title=.col.total.time,
-    description="the total consumed runtime of the run, i.e., the time until the run was terminated",
+    description=paste0("the total consumed runtime of the run, i.e., the time until the run was terminated, ",
+                       time.unit),
     is.col.integer=is.time.int,
     lower.bound=0L,
     upper.bound=time.bound);
@@ -67,7 +71,8 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
 
   last.improvement.time <- create.stat.columns(
     title=.col.last.improvement.time,
-    description="the time when the run made the last improvement, i.e., the time after which no further improvement was made, i.e., the time when the best solution was encountered during the run",
+    description=paste0("the time when the run made the last improvement, i.e., the time after which no further improvement was made, i.e., the time when the best solution was encountered during the run, ",
+                       time.unit),
     is.col.integer=is.time.int,
     lower.bound=0L,
     upper.bound=time.bound);
@@ -120,7 +125,8 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
     title=.col.reach.best.f.min.time,
     description=paste0("the time needed by the runs which discovered the best solution among all runs (",
                        .col.best.f, ".", .col.min.name,
-                       ") until they reached said solution"),
+                       ") until they reached said solution, ",
+                       time.unit),
     is.col.integer=is.time.int,
     lower.bound=0L,
     upper.bound=time.bound,
@@ -255,7 +261,8 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
   else { t = "double"; }
   budget.time <- create.columns(columns=list(
                       create.column(.col.budget.time,
-                                    "the maximum time granted to a run until forceful termination",
+                                    paste0("the maximum time granted to a run until forceful termination, ",
+                                           time.unit),
                                     t)),
                       conditions=c(.numeric.conditions(.col.budget.time, is.time.int),
                                    .bound.conditions(.col.budget.time, is.time.int,

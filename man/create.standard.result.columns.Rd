@@ -6,7 +6,8 @@
 \usage{
 create.standard.result.columns(are.objective.values.ints = TRUE,
   is.time.int = TRUE, objective.value.lower.bound = 0L,
-  objective.value.upper.bound = NA_integer_)
+  objective.value.upper.bound = NA_integer_,
+  time.unit = "measured in milliseconds")
 }
 \arguments{
 \item{are.objective.values.ints}{are objective values integers?}
@@ -16,6 +17,9 @@ create.standard.result.columns(are.objective.values.ints = TRUE,
 \item{objective.value.lower.bound}{a hard lower bound for objective values}
 
 \item{objective.value.upper.bound}{a hard upper bound for objective values}
+
+\item{time.unit}{a description of how time is measured; by default
+\code{"measured in milliseconds"}}
 }
 \value{
 the set of standard result columns
