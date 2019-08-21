@@ -298,6 +298,7 @@ read.bibliography <- function(bib.file) {
 
                         read <- gsub("\n", " ", read, fixed=TRUE);
                         read <- gsub("\\'i", "\u00ed", read, fixed=TRUE);
+                        read <- gsub("\\'\\i", "\u00ed", read, fixed=TRUE);
                         l1 <- nchar(read);
                         read <- sub("\\_(.+?)\\_\\,", "\\1\\,", read, fixed=FALSE);
                         l2 <- nchar(read);
