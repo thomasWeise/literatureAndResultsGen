@@ -27,6 +27,7 @@
 .col.budget.time <- "budget.time";
 
 .col.algo.id <- "algo.id";
+.col.algo.desc <- "algo.desc";
 .col.inst.id <- "inst.id";
 .col.inst.opt.bound.lower <- "inst.opt.bound.lower";
 .col.system.cpu.name <- "system.cpu.name";
@@ -41,6 +42,7 @@
 .col.system.compiler.name <- "system.compiler.name";
 .col.system.programming.language.name <- "system.programming.language.name";
 .col.system.external.tools.list <- "system.external.tools.list";
+.col.notes <- "notes";
 
 .func.result.data.frame.validate <- ".result.data.frame.validate";
 .func.result.data.frame.expand <- ".result.data.frame.expand";

@@ -17,6 +17,9 @@ create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
   algo.id <- create.column(.col.algo.id,
                            "the ID or short name of the algorithm used to solve the problem instance",
                            "character");
+  algo.desc <- create.column(.col.algo.desc,
+                           "a short description of the algorithm",
+                           "character");
   inst.id <- create.column(.col.inst.id,
                            "the ID of the problem instance solved",
                            "character");
@@ -72,10 +75,14 @@ create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
                                          "the name of the programming language in which the program was written",
                                          "character");
   system.external.tools.list  <- create.column(.col.system.external.tools.list,
-                                              "the name of the external tools, such as deterministic solvers or CPLEX, whatever was used in the experiments",
+                                              "the name of the external tools, such as deterministic solvers or CPLEX, whatever was used in the experiments, separated by ';'",
                                               "character");
+  notes <- create.column(.col.notes,
+                         "additional notes",
+                         "character");
 
   result <- create.columns(list(algo.id=algo.id,
+                                algo.desc=algo.desc,
                                 ref.id=ref.id,
                                 ref.year=ref.year,
                                 inst.id=inst.id,
@@ -91,17 +98,25 @@ create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
                                 system.vm.name=system.vm.name,
                                 system.compiler.name=system.compiler.name,
                                 system.programming.language.name=system.programming.language.name,
-                                system.external.tools.list=system.external.tools.list),
+                                system.external.tools.list=system.external.tools.list,
+                                notes=notes),
                            conditions = c(
                              paste0("all(!is.na(x$", algo.id$title, "))"),
                              paste0("is.character(x$", algo.id$title, ")"),
                              paste0("all(nchar(x$", algo.id$title, ") > 0L)"),
+
+                             paste0("all(!is.na(x$", algo.desc$title, "))"),
+                             paste0("is.character(x$", algo.desc$title, ")"),
+                             paste0("all(nchar(x$", algo.desc$title, ") > 0L)"),
+
                              paste0("all(!is.na(x$", inst.id$title, "))"),
                              paste0("is.character(x$", inst.id$title, ")"),
                              paste0("all(nchar(x$", inst.id$title, ") > 0L)"),
+
                              paste0("all(!is.na(x$", ref.id$title, "))"),
                              paste0("is.character(x$", ref.id$title, ")"),
                              paste0("all(nchar(x$", ref.id$title, ") > 0L)"),
+
                              paste0("all(!is.na(x$", inst.opt.bound.lower$title, "))"),
                              paste0("all(is.finite(x$", inst.opt.bound.lower$title, "))"),
 
@@ -138,7 +153,11 @@ create.standard.meta.columns <- function(are.objective.values.ints=TRUE,
                              paste0("all(is.character(x$", system.external.tools.list$title, "))"),
                              paste0("all(is.na(x$", system.external.tools.list$title, ") | (nchar(x$", system.external.tools.list$title, ") > 0L))"),
 
-                             paste0("all(is.logical(x$", system.runs.are.parallel$title, "))")
+                             paste0("all(is.logical(x$", system.runs.are.parallel$title, "))"),
+
+                             paste0("all(is.character(x$", notes$title, "))"),
+                             paste0("all(is.na(x$", notes$title, ") | (nchar(x$", notes$title, ") > 0L))")
+
                            ));
   result <- force(result);
   options(old.options);

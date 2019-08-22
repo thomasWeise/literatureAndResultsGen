@@ -47,12 +47,14 @@ make.r.doc.references <- function(refs, bibliography, logger=NULL) {
 
   refs <- unname(unlist(lapply(refs,
                                function(ref) {
-                                 text <- paste(unlist(texts[[ref]]), sep="\n", collapse="\n");
+                                 text <- paste(unlist(texts[[ref]]), sep=" ", collapse=" ");
                                  stopifnot(nchar(text) > 0L);
-                                 text <- strsplit(text, "\n", fixed=TRUE);
-                                 stopifnot(length(text) == 1L);
-                                 text <- text[[1L]];
-                                 stopifnot(length(text) >= 1L);
+                                 text <- sub("doi:\\s+(.*?)\\s+\\(URL\\:\\s+(.*?)\\)", "doi:\\\\href\\{\\2\\}\\{\\1\\}", text);
+                                 stopifnot(nchar(text) > 0L);
+                                 text <- sub("<URL\\:\\s+(.+?)>", "\\\\url\\{\\1\\}", text);
+                                 stopifnot(nchar(text) > 0L);
+                                 text <- sub("\\(URL\\:\\s+(.+?)\\)", "\\\\url\\{\\1\\}", text);
+                                 stopifnot(nchar(text) > 0L);
                                  text <- paste0("#' ", text);
                                  return(unname(unlist(c(text, "#' "))));
                                })));
