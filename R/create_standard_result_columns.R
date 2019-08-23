@@ -118,7 +118,17 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                                       TRUE, 1L,
                                                       paste0("x$", .col.n.runs)),
                                     .bound.conditions(.col.n.reach.best.f.min.runs, TRUE,
-                                                      NA_integer_, .max.runs)));
+                                                      NA_integer_, .max.runs)),
+                                  mergers=c(
+                                    paste0("  temp <- is.na(x$", .col.n.reach.best.f.min.runs,
+                                           ") & (!is.na(x$", .col.n.runs, ")) & (x$",
+                                           .col.n.runs, " == 1L);"),
+                                    paste0("  if(any(temp)) {"),
+                                    paste0("    changed <- TRUE;"),
+                                    paste0("    x$", .col.n.reach.best.f.min.runs, "[temp] <- 1L;"),
+                                    .force("    ", paste0("x$", .col.n.reach.best.f.min.runs), "x"),
+                                    paste0("  }")
+                                  ));
 
 
   reach.best.f.min.time <- create.stat.columns(
@@ -154,6 +164,33 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                                       " <= x$",
                                                       last.improvement.time$columns$max$title,
                                                       "))") }, ""));
+  stopifnot(length(reach.best.f.min.time$columns) == length(total.time$columns));
+  reach.best.f.min.time$mergers <- unlist(c(
+    paste0("  temp1 <- (!is.na(x$", .col.n.reach.best.f.min.runs,
+           ")) & (!is.na(x$", .col.n.runs, ")) & (x$",
+           .col.n.runs, " == x$", .col.n.reach.best.f.min.runs, ");"),
+    paste0("  if(any(temp1)) {"),
+    unlist(lapply(seq_along(reach.best.f.min.time$columns),
+      function(i) {
+        rbfm <- reach.best.f.min.time$columns[[i]];
+        tt   <- total.time$columns[[i]];
+        return(c(
+          paste0("    temp <- temp1 & (!is.na(x$", rbfm$title, ")) & is.na(x$", tt$title, ");"),
+          paste0("    if(any(temp)) {"),
+          paste0("      changed <- TRUE;"),
+          paste0("      x$", tt$title, "[temp] <- x$", rbfm$title, "[temp];"),
+          .force("    ", paste0("x$", tt$title), "x"),
+                 "    }",
+          paste0("    temp <- temp1 & is.na(x$", rbfm$title, ") & (!is.na(x$", tt$title, "));"),
+          paste0("    if(any(temp)) {"),
+          paste0("      changed <- TRUE;"),
+          paste0("      x$", rbfm$title, "[temp] <- x$", tt$title, "[temp];"),
+          .force("    ", paste0("x$", rbfm$title), "x"),
+          "    }"
+        ));
+      })),
+    paste0("  }")
+  ));
 
   reach.best.f.min.fes <- create.stat.columns(
     title=.col.reach.best.f.min.fes,
@@ -187,7 +224,32 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                                        " <= x$",
                                                        last.improvement.fes$columns$max$title,
                                                        "))") }, ""));
-
+  reach.best.f.min.fes$mergers <- unlist(c(
+    paste0("  temp1 <- (!is.na(x$", .col.n.reach.best.f.min.runs,
+           ")) & (!is.na(x$", .col.n.runs, ")) & (x$",
+           .col.n.runs, " == x$", .col.n.reach.best.f.min.runs, ");"),
+    paste0("  if(any(temp1)) {"),
+    unlist(lapply(seq_along(reach.best.f.min.fes$columns),
+                  function(i) {
+                    rbfm <- reach.best.f.min.fes$columns[[i]];
+                    tt   <- total.fes$columns[[i]];
+                    return(c(
+                      paste0("    temp <- temp1 & (!is.na(x$", rbfm$title, ")) & is.na(x$", tt$title, ");"),
+                      paste0("    if(any(temp)) {"),
+                      paste0("      changed <- TRUE;"),
+                      paste0("      x$", tt$title, "[temp] <- x$", rbfm$title, "[temp];"),
+                      .force("    ", paste0("x$", tt$title), "x"),
+                      "    }",
+                      paste0("    temp <- temp1 & is.na(x$", rbfm$title, ") & (!is.na(x$", tt$title, "));"),
+                      paste0("    if(any(temp)) {"),
+                      paste0("      changed <- TRUE;"),
+                      paste0("      x$", rbfm$title, "[temp] <- x$", tt$title, "[temp];"),
+                      .force("    ", paste0("x$", rbfm$title), "x"),
+                      "    }"
+                    ));
+                  })),
+    paste0("  }")
+  ));
 
   budget.fes <- create.columns(columns=list(
                      create.column(.col.budget.fes,

@@ -187,30 +187,44 @@ create.stat.columns <- function(title, description,
                 med.title, "))")
          );
 
-  .merge.for.num.1 <- function(from, to) {
-    c(paste0("if(any(!is.na(x$", to, "))) {"),
+  .merge.type <- function(from, to, fromIsInt, toIsInt) {
+    stopifnot(is.character(from),
+              nchar(from) > 0L,
+              is.character(to),
+              nchar(to) > 0L,
+              is.logical(fromIsInt),
+              is.logical(toIsInt));
+    if((fromIsInt == toIsInt) || (!toIsInt)) {
+      return(paste0("    x$", to, " <- x$", from, ";"));
+    }
+    return(c(paste0("    stopifnot(all(as.integer(x$", from, ") == x$", from, "));"),
+             paste0("    x$", to, " <- as.integer(x$", from, ");")));
+  }
+
+  .merge.for.num.1 <- function(from, to, fromIsInt, toIsInt) {
+    unlist(c(paste0("if(any(!is.na(x$", to, "))) {"),
       paste0("  temp <- ((!is.na(x$", n.runs.col, ")) & (x$", n.runs.col,
              " == 1L) & (!is.na(x$", from, ")) & is.na(x$",
              to, "));"),
       "  if(any(temp)) {",
       "    changed <- TRUE;",
-      paste0("    x$", to, "[temp] <- x$", from, "[temp];"),
+      .merge.type(paste0(from, "[temp]"), paste0(to, "[temp]"), fromIsInt, toIsInt),
       .force("    ", paste0("x$", to), "x"),
       "  }",
-      "}")
+      "}"))
   };
 
-  .merge.for.sd.0 <- function(from, to) {
-    c(paste0("if(any(!is.na(x$", to, "))) {"),
+  .merge.for.sd.0 <- function(from, to, fromIsInt, toIsInt) {
+    unlist(c(paste0("if(any(!is.na(x$", to, "))) {"),
       paste0("  temp <- ((!is.na(x$", sd.title, ")) & (x$", sd.title,
              " <= 0) & (!is.na(x$", from, ")) & is.na(x$",
              to, "));"),
       "  if(any(temp)) {",
       "    changed <- TRUE;",
-      paste0("    x$", to, "[temp] <- x$", from, "[temp];"),
+      .merge.type(paste0(from, "[temp]"), paste0(to, "[temp]"), fromIsInt, toIsInt),
       .force("    ", paste0("x$", to), "x"),
       "  }",
-      "}")
+      "}"))
   };
 
   .sd.for.num.1 <- function() {
@@ -219,7 +233,7 @@ create.stat.columns <- function(title, description,
              " == 1L) & is.na(x$", sd.title, "));"),
       "  if(any(temp)) {",
       "    changed <- TRUE;",
-      paste0("    x$", sd.title, "[temp] <- 0;"),
+      paste0("    x$", sd.title, "[temp] <- 0L;"),
       .force("    ", paste0("x$", sd.title), "x"),
       "  }",
       "}")
@@ -240,51 +254,51 @@ create.stat.columns <- function(title, description,
 
   # data mergers
   mergers <- c(
-      .merge.for.num.1(min.title, mean.title),
-      .merge.for.num.1(min.title, med.title),
-      .merge.for.num.1(min.title, mode.title),
-      .merge.for.num.1(min.title, max.title),
-      .merge.for.num.1(mean.title, min.title),
-      .merge.for.num.1(mean.title, med.title),
-      .merge.for.num.1(mean.title, mode.title),
-      .merge.for.num.1(mean.title, max.title),
-      .merge.for.num.1(med.title, min.title),
-      .merge.for.num.1(med.title, mean.title),
-      .merge.for.num.1(med.title, mode.title),
-      .merge.for.num.1(med.title, max.title),
-      .merge.for.num.1(mode.title, min.title),
-      .merge.for.num.1(mode.title, mean.title),
-      .merge.for.num.1(mode.title, med.title),
-      .merge.for.num.1(mode.title, max.title),
-      .merge.for.num.1(max.title, min.title),
-      .merge.for.num.1(max.title, mean.title),
-      .merge.for.num.1(max.title, med.title),
-      .merge.for.num.1(max.title, mode.title),
-      .merge.for.sd.0(min.title, mean.title),
-      .merge.for.sd.0(min.title, med.title),
-      .merge.for.sd.0(min.title, mode.title),
-      .merge.for.sd.0(min.title, max.title),
-      .merge.for.sd.0(mean.title, min.title),
-      .merge.for.sd.0(mean.title, med.title),
-      .merge.for.sd.0(mean.title, mode.title),
-      .merge.for.sd.0(mean.title, max.title),
-      .merge.for.sd.0(med.title, min.title),
-      .merge.for.sd.0(med.title, mean.title),
-      .merge.for.sd.0(med.title, mode.title),
-      .merge.for.sd.0(med.title, max.title),
-      .merge.for.sd.0(mode.title, min.title),
-      .merge.for.sd.0(mode.title, mean.title),
-      .merge.for.sd.0(mode.title, med.title),
-      .merge.for.sd.0(mode.title, max.title),
-      .merge.for.sd.0(max.title, min.title),
-      .merge.for.sd.0(max.title, mean.title),
-      .merge.for.sd.0(max.title, med.title),
-      .merge.for.sd.0(max.title, mode.title),
+      .merge.for.num.1(min.title, mean.title, is.col.integer, FALSE),
+      .merge.for.num.1(min.title, med.title, is.col.integer, FALSE),
+      .merge.for.num.1(min.title, mode.title, is.col.integer, FALSE),
+      .merge.for.num.1(min.title, max.title, is.col.integer, is.col.integer),
+      .merge.for.num.1(mean.title, min.title, FALSE, is.col.integer),
+      .merge.for.num.1(mean.title, med.title, FALSE, FALSE),
+      .merge.for.num.1(mean.title, mode.title, FALSE, FALSE),
+      .merge.for.num.1(mean.title, max.title, FALSE, is.col.integer),
+      .merge.for.num.1(med.title, min.title, FALSE, is.col.integer),
+      .merge.for.num.1(med.title, mean.title, FALSE, FALSE),
+      .merge.for.num.1(med.title, mode.title, FALSE, FALSE),
+      .merge.for.num.1(med.title, max.title, FALSE, is.col.integer),
+      .merge.for.num.1(mode.title, min.title, FALSE, is.col.integer),
+      .merge.for.num.1(mode.title, mean.title, FALSE, FALSE),
+      .merge.for.num.1(mode.title, med.title, FALSE, FALSE),
+      .merge.for.num.1(mode.title, max.title, FALSE, is.col.integer),
+      .merge.for.num.1(max.title, min.title, is.col.integer, is.col.integer),
+      .merge.for.num.1(max.title, mean.title, is.col.integer, FALSE),
+      .merge.for.num.1(max.title, med.title, is.col.integer, FALSE),
+      .merge.for.num.1(max.title, mode.title, is.col.integer, FALSE),
+      .merge.for.sd.0(min.title, mean.title, is.col.integer, FALSE),
+      .merge.for.sd.0(min.title, med.title, is.col.integer, FALSE),
+      .merge.for.sd.0(min.title, mode.title, is.col.integer, FALSE),
+      .merge.for.sd.0(min.title, max.title, is.col.integer, is.col.integer),
+      .merge.for.sd.0(mean.title, min.title, FALSE, is.col.integer),
+      .merge.for.sd.0(mean.title, med.title, FALSE, FALSE),
+      .merge.for.sd.0(mean.title, mode.title, FALSE, FALSE),
+      .merge.for.sd.0(mean.title, max.title, FALSE, is.col.integer),
+      .merge.for.sd.0(med.title, min.title, FALSE, is.col.integer),
+      .merge.for.sd.0(med.title, mean.title, FALSE, FALSE),
+      .merge.for.sd.0(med.title, mode.title, FALSE, FALSE),
+      .merge.for.sd.0(med.title, max.title, FALSE, is.col.integer),
+      .merge.for.sd.0(mode.title, min.title, FALSE, is.col.integer),
+      .merge.for.sd.0(mode.title, mean.title, FALSE, FALSE),
+      .merge.for.sd.0(mode.title, med.title, FALSE, FALSE),
+      .merge.for.sd.0(mode.title, max.title, FALSE, is.col.integer),
+      .merge.for.sd.0(max.title, min.title, FALSE, is.col.integer),
+      .merge.for.sd.0(max.title, mean.title, is.col.integer, FALSE),
+      .merge.for.sd.0(max.title, med.title, is.col.integer, FALSE),
+      .merge.for.sd.0(max.title, mode.title, is.col.integer, FALSE),
       .sd.for.num.1(),
       .fix.from.min.max(mean.title),
       .fix.from.min.max(med.title),
       .fix.from.min.max(mode.title),
-      .fix.from.min.max(sd.title, value="0")
+      .fix.from.min.max(sd.title, value="0L")
   );
 
   # combine
