@@ -18,7 +18,10 @@ make.r.doc.references <- function(refs, bibliography, logger=NULL) {
     logger("Generating reference for following works: ", paste(refs, sep=", ", collapse=", "));
   }
 
-  stopifnot(.col.ref.id %in% colnames(bibliography));
+  stopifnot(.col.ref.id %in% colnames(bibliography),
+            .col.ref.text %in% colnames(bibliography));
+  bibliography <- bibliography[order(unname(unlist(bibliography[.col.ref.text]))), ];
+
   map <- as.character(unname(unlist(bibliography[.col.ref.id])));
   stopifnot(is.character(map),
             length(map) == nrow(bibliography),
@@ -41,6 +44,7 @@ make.r.doc.references <- function(refs, bibliography, logger=NULL) {
   refs <- sort(found);
 
   stopifnot(.col.ref.text %in% colnames(bibliography));
+
   texts <- as.character(unname(unlist(bibliography[.col.ref.text])));
   stopifnot(length(texts) == length(map),
             all(nchar(texts) > 0L));
