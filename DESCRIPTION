@@ -20,9 +20,11 @@ LazyData: true
 RoxygenNote: 6.1.1
 Collate: 
     'base_conditions.R'
+    'types.R'
+    'names.R'
+    'bks.R'
     'create_column.R'
     'force.R'
-    'names.R'
     'create_stat_columns.R'
     'create_standard_meta_columns.R'
     'create_standard_result_columns.R'

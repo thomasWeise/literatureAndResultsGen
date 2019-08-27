@@ -20,11 +20,49 @@ generate.result.data.frame.validate.function <- function(columns,
   code <- c("#' @title Validate a Data Frame with Results",
             "#' @description Check whether all data in the frame \\code{x} is consistent.",
             "#' @param x the data frame",
+            "#' @param instances the instance data frame",
             "#' @return either \\code{TRUE} or an error is thrown.",
-            paste0(function.name, " <- function(x) {",
-            "  old.options <- options(warn=2);"));
+            paste0(function.name, " <- function(x, instances) {",
+            "  old.options <- options(warn=2);",
+            "  stopifnot(is.data.frame(x),",
+            "            nrow(x) > 0L,",
+            "            ncol(x) > 0L,",
+            "            is.data.frame(instances),",
+            "            nrow(instances) > 0L,",
+            "            ncol(instances) > 0L);"));
 
   cond <- unlist(columns$conditions);
+
+  names <- vapply(columns$columns, function(col) col$title, NA_character_);
+  stopifnot(length(names) > 0L,
+            all(nchar(names) > 0L),
+            sum(names == .col.inst.id) == 1L);
+
+  check.cols <- c(paste0(.col.best.f, ".", .col.min.name),
+                  paste0(.col.best.f, ".", .col.mean.name),
+                  paste0(.col.best.f, ".", .col.med.name),
+                  paste0(.col.best.f, ".", .col.mode.name),
+                  paste0(.col.best.f, ".", .col.max.name));
+
+  cond <- unname(unlist(c(cond,
+            paste0("all(c(\"", .col.inst.id, "\", \"",
+                    .col.inst.opt.bound.lower, "\") %in% colnames(instances))"),
+            paste0("\"", .col.inst.id, "\" %in% colnames(x)"),
+            paste0("all(vapply(x$", .col.inst.id, ", function(cn) { sum(instances$",
+                   .col.inst.id, " == cn) == 1L }, FALSE))"),
+            unlist(unname(lapply(check.cols,
+             function(col) {
+               if(!(col %in% names)) {
+                 return(character(0));
+               }
+               return(c(paste0("\"", col, "\" %in% colnames(x)"),
+                       paste0("all(vapply(seq_len(nrow(x)), function(i) { is.na(x$",
+                             col, "[[i]]) || (x$", col, "[[i]] >= instances$",
+                             .col.inst.opt.bound.lower, "[instances$",
+                             .col.inst.id, " == x$", .col.inst.id, "[[i]]]) }, FALSE))")));
+             })))
+            )));
+
   l <- length(cond);
   if(l > 0L) {
     cond[[1L]] <- paste0("  stopifnot(", cond[[1L]]);
@@ -73,10 +111,23 @@ generate.result.data.frame.expand.function <- function(columns,
   code <- unname(unlist(c("#' @title Expand a Data Frame with Results",
             "#' @description Infer all data that can be infered from frame \\code{x} is and return the expanded frame.",
             "#' @param x the data frame",
+            "#' @param instances the instance data frame",
             "#' @return the expanded data frame.",
-            paste0(function.name, " <- function(x) {"),
-            paste0("  while(", validate.function.name, "(x)) {"),
+            paste0(function.name, " <- function(x, instances) {"),
             "  old.options <- options(warn=2);",
+            "  stopifnot(is.data.frame(x),",
+            "            nrow(x) > 0L,",
+            "            ncol(x) > 0L,",
+            "            is.data.frame(instances),",
+            "            nrow(instances) > 0L,",
+            "            ncol(instances) > 0L);",
+            paste0("  while(", validate.function.name, "(x, instances)) {"),
+            "  stopifnot(is.data.frame(x),",
+            "            nrow(x) > 0L,",
+            "            ncol(x) > 0L,",
+            "            is.data.frame(instances),",
+            "            nrow(instances) > 0L,",
+            "            ncol(instances) > 0L);",
             "    changed <- FALSE;",
             paste0("    ", unname(unlist(columns$mergers))),
             "    if(!changed) {",
@@ -189,6 +240,14 @@ generate.result.data.frame.load.function <- function(meta.columns,
            "            ncol(frame) > 0L);",
            "  if(exists(\"logger\")) { logger(\"Done loading file '\", file, \"', got columns '\", paste(colnames(frame), sep=\"', '\", collapse=\"', '\"), \"'.\"); }",
            .force("  ", "frame"),
+           paste0("  stopifnot(\"", .col.inst.id, "\" %in% colnames(frame));"),
+           paste0("  remove.rows <- startsWith(trimws(frame$", .col.inst.id, "), \"#\");"),
+           "  if(any(remove.rows)) {",
+           "     if(exists(\"logger\")) { logger(\"Found \", sum(remove.rows), \", rows commented out, removing them.\"); }",
+           "     frame <- frame[!remove.rows, ];",
+           .force(prefix="    ", "frame"),
+           "  }",
+           "  stopifnot(nrow(frame) > 0L);",
            paste(unlist(c("  permitted <- c(\"",
                           all.columns$columns[[1L]]$title,
                           "\"",
@@ -293,12 +352,12 @@ generate.result.data.frame.load.function <- function(meta.columns,
            .force("    ", paste0("x$", .col.ref.year), "x"),
            paste0("  stopifnot(all(is.finite(x$", .col.ref.year, ")));"),
            "  if(exists(\"logger\")) { logger(\"Validating data from file '\", file, \"'.\"); }",
-           paste0("  ", validate.function.name, "(x);"),
+           paste0("  ", validate.function.name, "(x, instances);"),
            "  if(exists(\"logger\")) { logger(\"Expanding data from file '\", file, \"'.\"); }",
-           paste0("  x <- ", expand.function.name, "(x);"),
+           paste0("  x <- ", expand.function.name, "(x, instances);"),
            .force("  ", "x"),
            "  if(exists(\"logger\")) { logger(\"Re-validating data from file '\", file, \"'.\"); }",
-           paste0("  ", validate.function.name, "(x);"),
+           paste0("  ", validate.function.name, "(x, instances);"),
            "  if(exists(\"logger\")) { logger(\"Done loading, expanding, and validating file '\", file, \"'.\"); }",
            "  options(old.options);",
            "  return(x);",
@@ -363,6 +422,8 @@ generate.result.load.all.function <- function(meta.columns,
   stopifnot(sum(vapply(meta.columns$columns, function(ii) ii$title == .col.inst.id, TRUE)) == 1L);
   stopifnot(sum(vapply(meta.columns$columns, function(ii) ii$title == .col.ref.id, TRUE)) == 1L);
 
+  all.cols <- unlist(list(meta.columns$columns, result.columns$columns), recursive = FALSE);
+
   code <-c("#' @title Load All Result Data Frames based on a Meta-Data Frame",
            "#' @description Load a all result data frames based on a meta-data frame.",
            "#' @param file the path to the meta-data file to load",
@@ -413,12 +474,12 @@ generate.result.load.all.function <- function(meta.columns,
            "  x <- do.call(rbind, x);",
            .force("  ", "x"),
            "  if(exists(\"logger\")) { logger(\"Now validating joint frame.\"); }",
-           paste0("  ", validate.function.name, "(x);"),
+           paste0("  ", validate.function.name, "(x, instances);"),
            "  if(exists(\"logger\")) { logger(\"Now expanding joint frame.\"); }",
-           paste0("  x <- ", expand.function.name, "(x);"),
+           paste0("  x <- ", expand.function.name, "(x, instances);"),
            .force("  ", "x"),
            "  if(exists(\"logger\")) { logger(\"Now re-validating joint frame.\"); }",
-           paste0("  ", validate.function.name, "(x);"),
+           paste0("  ", validate.function.name, "(x, instances);"),
            "  if(exists(\"logger\")) { logger(\"Now finalizing data.\"); }",
            paste0("x <- x[order(as.character(x$", .col.algo.id, "), as.character(x$",
                           .col.ref.id, "), as.character(x$", .col.inst.id, ")),];"),
@@ -430,6 +491,23 @@ generate.result.load.all.function <- function(meta.columns,
            "  keep <- vapply(seq_len(ncol(x)), function(i) any(!is.na(x[, i])), FALSE);",
            "  stopifnot(any(keep));",
            "  x <- x[, keep];",
+           .force("  ", "x"),
+           unname(unlist(lapply(all.cols,
+              function(column) {
+                if((column$type == "real") |
+                   (column$type == "double") |
+                   (column$type == "numeric")) {
+                  return(c(paste0("  if(\"", column$title, "\" %in% colnames(x)) {"),
+                           paste0("    tempcol.a <- unname(unlist(x$", column$title, "));"),
+                           "    tempcol.b <- try.convert.numeric.to.int(x=tempcol.a, stopIfFails=FALSE, canFloor=FALSE);",
+                           "    if(!identical(tempcol.a, tempcol.b)) {",
+                           paste0("      x$", column$title, " <- tempcol.b;"),
+                           .force("      ", paste0("x$", column$title), "x"),
+                           "    }",
+                           "  }"));
+                }
+                return(character(0));
+              }))),
            .force("  ", "x"),
            "  options(old.options);",
            "  if(exists(\"logger\")) { logger(\"Done with loading, merging, and finalizing the data.\"); }",

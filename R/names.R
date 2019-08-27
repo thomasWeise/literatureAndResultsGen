@@ -20,6 +20,9 @@
 .col.total.time <- "total.time";
 .col.total.fes <- "total.fes";
 
+.col.inst.bks <- "inst.bks";
+.col.inst.bks.ref <- "inst.bks.ref";
+
 .col.reach.best.f.min.time <- paste0("reach.best.f.", .col.min.name, ".time");
 .col.reach.best.f.min.fes <- paste0("reach.best.f.", .col.min.name, ".fes");
 .col.n.reach.best.f.min.runs <- paste0("reach.best.f.", .col.min.name, ".runs");
