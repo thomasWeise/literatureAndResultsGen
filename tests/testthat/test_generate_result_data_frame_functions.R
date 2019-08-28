@@ -6,11 +6,13 @@ test_that("Test generate.result.data.frame.validate.function", {
   for(is.col.integer in c(TRUE, FALSE)) {
       for(lower.bound in c(NA_integer_, 0L, 10L)) {
         for(upper.bound in c(NA_integer_, 20L, 50L)) {
-          cc <- create.stat.columns(title="runtime",
+          cc <- join.columns(
+                create.stat.columns(title="runtime",
                                     description="bla",
                                     is.col.integer,
                                     lower.bound,
-                                    upper.bound);
+                                    upper.bound),
+                create.standard.meta.columns());
 
           d <- generate.result.data.frame.validate.function(cc, "...tmpfunc");
           t <- parse(text=paste(d, sep="\n", collapse="\n"));
