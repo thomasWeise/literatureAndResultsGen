@@ -33,9 +33,12 @@ append.bks.to.instance.frame <- function(instances, results,
                   .col.best.f.max) %in% colnames(results)) > 0L
             );
 
-  if(exists("logger")) {
-    logger("Now computing the best-known solutions from results.");
-  }
+  if(exists("logger", globalenv())) {
+    logger <- get("logger", globalenv());
+    if(is.function(logger)) {
+      logger("Now computing the best-known solutions from results.");
+    } else { logger <- NULL; }
+  } else { logger <- NULL; }
 
   inst.id <- as.character(unname(unlist(instances[.col.inst.id])));
   stopifnot(all(is.character(inst.id)),
@@ -132,7 +135,7 @@ append.bks.to.instance.frame <- function(instances, results,
 
   stopifnot(have);
 
-  if(exists("logger")) {
+  if(!is.null(logger)) {
     logger("computing the best values obtained by any run.");
   }
   results.best.f <- vapply(seq_len(nrow(results)), function(i) {
@@ -176,7 +179,7 @@ append.bks.to.instance.frame <- function(instances, results,
   }
   template <- force(template);
 
-  if(exists("logger")) {
+  if(!is.null(logger)) {
     logger("best values determined.");
   }
 
@@ -277,7 +280,7 @@ append.bks.to.instance.frame <- function(instances, results,
   instances <- force(instances);
   instances <- do.call(force, list(instances));
 
-  if(exists("logger")) {
+  if(!is.null(logger)) {
     logger("Finished computing the best-known solutions from results.");
   }
   options(old.options);

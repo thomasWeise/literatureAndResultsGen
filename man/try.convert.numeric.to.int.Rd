@@ -11,7 +11,7 @@ try.convert.numeric.to.int(x, stopIfFails = FALSE, canFloor = FALSE)
 
 \item{stopIfFails}{stop if the conversion fails}
 
-\item{canRound}{is it permitted to floor the integre values?}
+\item{canFloor}{is it permitted to floor the integre values?}
 }
 \value{
 the integer vector

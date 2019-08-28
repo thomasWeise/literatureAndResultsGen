@@ -3,7 +3,7 @@
 #' @description Try to convert a numeric vector to an integer vector
 #' @param x the vector
 #' @param stopIfFails stop if the conversion fails
-#' @param canRound is it permitted to floor the integre values?
+#' @param canFloor is it permitted to floor the integre values?
 #' @return the integer vector
 #' @export try.convert.numeric.to.int
 try.convert.numeric.to.int <- function(x, stopIfFails=FALSE, canFloor=FALSE) {
