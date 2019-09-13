@@ -1,3 +1,5 @@
+.return.empty.string <- function(ref.id) ""
+
 #' @title Generate an References List
 #' @description Generate an a textual list of references based on the given
 #'   formatting instructions. This function is used by
@@ -10,11 +12,19 @@
 #'   "\\2" is the full link
 #' @param subst.url a substitute regular expression for urls, "\\1" is the url
 #' @param first.line.start the starting string of the first line
+#' @param first.line.end the ending string of the first line
 #' @param first.line.as.separate.line should \code{first.line.start} be a
 #'   separate line (\code{TRUE}) or should it be the beginning pasted in front
 #'   of a normal line of references (\code{FALSE})
+#' @param make.text.before a function to which the reference id is passed and
+#'   which should return a string to be pasted before the actual reference text
+#'   (or \code{""}); if \code{NULL} is supplied, no strings are added
+#' @param make.text.after a function to which the reference id is passed and
+#'   which should return a string to be pasted after the actual reference text
+#'   (or \code{""}); if \code{NULL} is supplied, no strings are added
 #' @param normal.line.start a string to paste at the beginning of every normal
 #'   line
+#' @param normal.line.end a string to paste at the end of every normal line
 #' @param between.two.lines a string to be pasted as separate line between two
 #'   normal lines
 #' @param after.first.line the string to be inserted as line after the first
@@ -26,8 +36,12 @@ make.references.text <- function(refs=NULL, bibliography, logger=NULL,
                                  subst.doi="doi:\\\\href\\{\\2\\}\\{\\1\\}",
                                  subst.url="\\\\url\\{\\1\\}",
                                  first.line.start="#' @references ",
+                                 first.line.end="",
                                  first.line.as.separate.line=FALSE,
+                                 make.text.before=NULL,
+                                 make.text.after=NULL,
                                  normal.line.start="#' ",
+                                 normal.line.end="",
                                  between.two.lines ="#'",
                                  after.first.line=between.two.lines) {
 
@@ -39,6 +53,10 @@ make.references.text <- function(refs=NULL, bibliography, logger=NULL,
   if(is.null(refs)) {
     refs <- unname(unlist(bibliography[.col.ref.id]));
   }
+  if(is.null(make.text.after)) { make.text.after <- .return.empty.string; }
+  stopifnot(is.function(make.text.after));
+  if(is.null(make.text.before)) { make.text.before <- .return.empty.string; }
+  stopifnot(is.function(make.text.before));
 
   refs <- as.character(unique(unname(unlist(refs))));
   stopifnot(is.character(refs),
@@ -90,14 +108,35 @@ make.references.text <- function(refs=NULL, bibliography, logger=NULL,
   first.line.start <- do.call(force, list(first.line.start));
   normal.line.start <- force(normal.line.start);
   normal.line.start <- do.call(force, list(normal.line.start));
+  normal.line.end <- force(normal.line.end);
+  normal.line.end <- do.call(force, list(normal.line.end));
+  first.line.end <- force(first.line.end);
+  first.line.end <- do.call(force, list(first.line.end));
 
   stopifnot(is.character(between.two.lines) | is.null(between.two.lines),
             is.character(after.first.line) | is.null(after.first.line),
             is.character(first.line.start) | is.null(first.line.start),
-            is.character(normal.line.start) | is.null(normal.line.start));
+            is.character(first.line.end) | is.null(first.line.end),
+            is.character(normal.line.start) | is.null(normal.line.start),
+            is.character(normal.line.end) | is.null(normal.line.end));
+
+  if(is.null(first.line.start)) { first.line.start <- ""; }
+  if(is.null(first.line.end)) { first.line.end <- ""; }
+  if(is.null(normal.line.start)) { normal.line.start <- ""; }
+  if(is.null(normal.line.end)) { normal.line.end <- ""; }
 
   refs <- unname(unlist(lapply(refs,
                                function(ref) {
+                                 ref.id <- bibliography$ref.id[[ref]];
+                                 stopifnot(!is.na(ref),
+                                           !is.null(ref),
+                                           length(ref) == 1L,
+                                           is.integer(ref),
+                                           ref > 0L,
+                                           ref <= nrow(bibliography),
+                                           is.character(ref.id),
+                                           nchar(ref.id) > 0L,
+                                           length(ref.id) == 1L);
                                  text <- paste(unlist(texts[[ref]]), sep=" ", collapse=" ");
                                  stopifnot(nchar(text) > 0L);
                                  text <- sub("doi:\\s+(.*?)\\s+\\(URL\\:\\s+(.*?)\\)", subst.doi, text);
@@ -106,14 +145,43 @@ make.references.text <- function(refs=NULL, bibliography, logger=NULL,
                                  stopifnot(nchar(text) > 0L);
                                  text <- sub("\\(URL\\:\\s+(.+?)\\)", subst.url, text);
                                  stopifnot(nchar(text) > 0L);
-                                 text <- paste0(normal.line.start, text);
+
+                                 before <- unname(unlist(make.text.before(ref.id)));
+                                 if(is.null(before)) {
+                                   before <- "";
+                                 } else {
+                                   before <- paste(before, sep="", collapse="");
+                                 }
+                                 stopifnot(is.character(before),
+                                           nchar(before) >= 0L,
+                                           !is.na(before));
+
+                                 after <- unname(unlist(make.text.after(ref.id)));
+                                 if(is.null(after)) {
+                                   after <- "";
+                                 } else {
+                                   after <- paste(after, sep="", collapse="");
+                                 }
+                                 stopifnot(is.character(after),
+                                           nchar(after) >= 0L,
+                                           !is.na(after));
+
+                                 text <- paste0(normal.line.start,
+                                                before,
+                                                text,
+                                                after,
+                                                normal.line.end);
                                  return(unname(unlist(c(text, between.two.lines))));
                                })));
 
   if(first.line.as.separate.line) {
-    refs <- unname(unlist(c(first.line.start, after.first.line, refs)));
+    refs <- unname(unlist(c(paste0(first.line.start, first.line.end), after.first.line, refs)));
   } else {
-    refs[[1L]] <- paste0(first.line.start, substr(refs[[1L]], nchar(normal.line.start) + 1L, nchar(refs[[1L]])));
+    refs[[1L]] <- paste0(first.line.start,
+                         substr(refs[[1L]],
+                                nchar(normal.line.start) + 1L,
+                                nchar(refs[[1L]]) - nchar(normal.line.end)),
+                         first.line.end);
 
     if(!identical(between.two.lines, after.first.line)) {
       if(is.null(between.two.lines)) {

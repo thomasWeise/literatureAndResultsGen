@@ -7,9 +7,11 @@
 make.references.text(refs = NULL, bibliography, logger = NULL,
   subst.doi = "doi:\\\\\\\\href\\\\{\\\\2\\\\}\\\\{\\\\1\\\\}",
   subst.url = "\\\\\\\\url\\\\{\\\\1\\\\}",
-  first.line.start = "#' @references ",
-  first.line.as.separate.line = FALSE, normal.line.start = "#' ",
-  between.two.lines = "#'", after.first.line = between.two.lines)
+  first.line.start = "#' @references ", first.line.end = "",
+  first.line.as.separate.line = FALSE, make.text.before = NULL,
+  make.text.after = NULL, normal.line.start = "#' ",
+  normal.line.end = "", between.two.lines = "#'",
+  after.first.line = between.two.lines)
 }
 \arguments{
 \item{refs}{an arbitrary collection of vectors with reference IDs, if
@@ -26,12 +28,24 @@ make.references.text(refs = NULL, bibliography, logger = NULL,
 
 \item{first.line.start}{the starting string of the first line}
 
+\item{first.line.end}{the ending string of the first line}
+
 \item{first.line.as.separate.line}{should \code{first.line.start} be a
 separate line (\code{TRUE}) or should it be the beginning pasted in front
 of a normal line of references (\code{FALSE})}
 
+\item{make.text.before}{a function to which the reference id is passed and
+which should return a string to be pasted before the actual reference text
+(or \code{""}); if \code{NULL} is supplied, no strings are added}
+
+\item{make.text.after}{a function to which the reference id is passed and
+which should return a string to be pasted after the actual reference text
+(or \code{""}); if \code{NULL} is supplied, no strings are added}
+
 \item{normal.line.start}{a string to paste at the beginning of every normal
 line}
+
+\item{normal.line.end}{a string to paste at the end of every normal line}
 
 \item{between.two.lines}{a string to be pasted as separate line between two
 normal lines}
