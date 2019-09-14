@@ -30,6 +30,7 @@
 #'   normal lines (optional, default value is supplied)
 #' @param after.first.line the string to be inserted as line after the first
 #'   line (optional, default value is supplied)
+#' @param sort should the bibliographic references be sorted?
 #' @return the multi-line reference text
 #' @include names.R
 #' @include make_references_text.R
@@ -45,7 +46,8 @@ make.md.references <- function(refs, bibliography,  logger=NULL,
                                normal.line.start="* ",
                                normal.line.end="",
                                between.two.lines=NULL,
-                               after.first.line=if(is.null(first.line)) { NULL } else { "" }) {
+                               after.first.line=if(is.null(normal.line.start)) { NULL } else { "" },
+                               sort=TRUE) {
   return(make.references.text(refs=refs,
                               bibliography=bibliography,
                               logger=logger,
@@ -59,5 +61,6 @@ make.md.references <- function(refs, bibliography,  logger=NULL,
                               normal.line.start=normal.line.start,
                               normal.line.end=normal.line.end,
                               between.two.lines=between.two.lines,
-                              after.first.line=after.first.line));
+                              after.first.line=after.first.line,
+                              sort=sort));
 }

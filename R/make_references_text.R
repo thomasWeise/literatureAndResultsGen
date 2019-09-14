@@ -29,6 +29,7 @@
 #'   normal lines
 #' @param after.first.line the string to be inserted as line after the first
 #'   line
+#' @param sort should the bibliographic references be sorted?
 #' @return the multi-line reference text
 #' @include names.R
 #' @export make.references.text
@@ -43,7 +44,8 @@ make.references.text <- function(refs=NULL, bibliography, logger=NULL,
                                  normal.line.start="#' ",
                                  normal.line.end="",
                                  between.two.lines ="#'",
-                                 after.first.line=between.two.lines) {
+                                 after.first.line=between.two.lines,
+                                 sort=TRUE) {
 
   stopifnot(is.data.frame(bibliography),
             .col.ref.id %in% colnames(bibliography),
@@ -71,7 +73,11 @@ make.references.text <- function(refs=NULL, bibliography, logger=NULL,
     logger("Generating reference for following works: ", paste(refs, sep=", ", collapse=", "));
   }
 
-  bibliography <- bibliography[order(unname(unlist(bibliography[.col.ref.text]))), ];
+  if(sort) {
+    bibliography <- bibliography[order(unname(unlist(bibliography[.col.ref.text]))), ];
+    bibliography <- force(bibliography);
+    bibliography <- do.call(force, list(bibliography));
+  }
 
   map <- as.character(unname(unlist(bibliography[.col.ref.id])));
   stopifnot(is.character(map),

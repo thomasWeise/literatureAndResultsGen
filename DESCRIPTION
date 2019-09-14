@@ -32,4 +32,5 @@ Collate:
     'make_references_text.R'
     'make_md_references.R'
     'make_r_doc_references.R'
+    'make_readme_toc.R'
     'read_bibliography.R'

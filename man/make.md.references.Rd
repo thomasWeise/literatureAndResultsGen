@@ -10,8 +10,8 @@ make.md.references(refs, bibliography, logger = NULL,
   first.line.end = "", first.line.as.separate.line = TRUE,
   make.text.before = NULL, make.text.after = NULL,
   normal.line.start = "* ", normal.line.end = "",
-  between.two.lines = NULL, after.first.line = if (is.null(first.line))
-  {     NULL } else {     "" })
+  between.two.lines = NULL, after.first.line = if
+  (is.null(normal.line.start)) {     NULL } else {     "" }, sort = TRUE)
 }
 \arguments{
 \item{refs}{an arbitrary collection of vectors with reference IDs}
@@ -57,6 +57,8 @@ normal lines (optional, default value is supplied)}
 
 \item{after.first.line}{the string to be inserted as line after the first
 line (optional, default value is supplied)}
+
+\item{sort}{should the bibliographic references be sorted?}
 }
 \value{
 the multi-line reference text

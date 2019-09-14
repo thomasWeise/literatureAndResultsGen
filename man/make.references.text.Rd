@@ -11,7 +11,7 @@ make.references.text(refs = NULL, bibliography, logger = NULL,
   first.line.as.separate.line = FALSE, make.text.before = NULL,
   make.text.after = NULL, normal.line.start = "#' ",
   normal.line.end = "", between.two.lines = "#'",
-  after.first.line = between.two.lines)
+  after.first.line = between.two.lines, sort = TRUE)
 }
 \arguments{
 \item{refs}{an arbitrary collection of vectors with reference IDs, if
@@ -52,6 +52,8 @@ normal lines}
 
 \item{after.first.line}{the string to be inserted as line after the first
 line}
+
+\item{sort}{should the bibliographic references be sorted?}
 }
 \value{
 the multi-line reference text
