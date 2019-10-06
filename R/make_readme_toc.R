@@ -41,58 +41,72 @@ make.readme.toc <- function(text, min.level=2L) {
   levels <- rep.int(0L, 10L);
 
   text <- trimws(text, which="right");
-  lines <- startsWith(text, "#");
 
+# handle included source code examples
+  toggles <- startsWith(text, "```");
+  if(any(toggles)) {
+    stopifnot((sum(toggles) %% 2L) == 0L);
+    allowed <- TRUE;
+    for(i in seq_along(toggles)) {
+      allowed <- xor(allowed, toggles[[i]]);
+      toggles[[i]] <- allowed;
+    }
+  } else {
+    toggles <- rep.int(TRUE, length(text));
+  }
+
+# done handline code, now building toc
   depth <- min.level + 1L;
   toc <- character(0);
 
   for(i in seq_along(text)) {
-
-    line <- text[[i]];
-    stopifnot(is.character(line),
-              length(line) == 1L,
-              !is.na(line));
-    line <- trimws(line);
-    if(startsWith(line, "#")) {
-
-      depth <- 0L;
-
+    if(toggles[[i]]) {
+      line <- text[[i]];
+      stopifnot(is.character(line),
+                length(line) == 1L,
+                !is.na(line));
       line <- trimws(line);
-      while(startsWith(line, "#")) {
-        line <- substr(line, 2L, nchar(line));
+      if(startsWith(line, "#")) {
+
+        depth <- 0L;
+
         line <- trimws(line);
-        depth <- depth + 1L;
-      }
-
-      stopifnot(depth > 0L,
-                !startsWith("#", line),
-                nchar(line) > 0L,
-                depth <= length(levels));
-
-
-      current <- levels[[depth]] + 1L;
-      if(depth < length(levels)) {
-        levels[seq.int(from=(depth+1L), to=length(levels))] <- 0L;
-      }
-      levels[[depth]] <- current;
-
-      repl <- paste0(paste(rep.int("#", depth), sep="", collapse=""), " ");
-      depth.string <- "";
-      depth.sep <- "";
-      if(depth >= min.level) {
-        depth.string <- paste0(paste(levels[seq.int(from=min.level, to=depth)], sep=".", collapse="."), ". ");
-        repl <- paste0(repl, depth.string);
-        if(depth > min.level) {
-          depth.sep <- paste(rep.int("  ", (depth - min.level)), sep="", collapse="");
+        while(startsWith(line, "#")) {
+          line <- substr(line, 2L, nchar(line));
+          line <- trimws(line);
+          depth <- depth + 1L;
         }
-      }
-      repl <- paste0(repl, line);
-      if(depth >= min.level) {
-        toc <- unname(unlist(c(toc, paste0(depth.sep, "- [", depth.string, line, "](",
-                                           .create.github.readme.link(repl), ")"))));
-      }
 
-      text[[i]] <- repl;
+        stopifnot(depth > 0L,
+                  !startsWith("#", line),
+                  nchar(line) > 0L,
+                  depth <= length(levels));
+
+
+        current <- levels[[depth]] + 1L;
+        if(depth < length(levels)) {
+          levels[seq.int(from=(depth+1L), to=length(levels))] <- 0L;
+        }
+        levels[[depth]] <- current;
+
+        repl <- paste0(paste(rep.int("#", depth), sep="", collapse=""), " ");
+        depth.string <- "";
+        depth.sep <- "";
+        if(depth >= min.level) {
+          depth.string <- paste0(paste(levels[seq.int(from=min.level, to=depth)], sep=".", collapse="."), ". ");
+          repl <- paste0(repl, depth.string);
+          if(depth > min.level) {
+            depth.sep <- paste(rep.int("  ", (depth - min.level)), sep="", collapse="");
+          }
+        }
+        repl <- paste0(repl, line);
+        if(depth >= min.level) {
+          toc <- unname(unlist(c(toc, paste0(depth.sep, "- [", depth.string, line, "](",
+                                             .create.github.readme.link(repl), ")"))));
+        }
+
+        text[[i]] <- repl;
+      }
     }
   }
 
