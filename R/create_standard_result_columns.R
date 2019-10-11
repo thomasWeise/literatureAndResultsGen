@@ -166,6 +166,7 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                                       "))") }, ""));
   stopifnot(length(reach.best.f.min.time$columns) == length(total.time$columns));
   reach.best.f.min.time$mergers <- unlist(c(
+    reach.best.f.min.time$mergers,
     paste0("  temp1 <- (!is.na(x$", .col.n.reach.best.f.min.runs,
            ")) & (!is.na(x$", .col.n.runs, ")) & (x$",
            .col.n.runs, " == x$", .col.n.reach.best.f.min.runs, ");"),
@@ -225,6 +226,7 @@ create.standard.result.columns <- function(are.objective.values.ints=TRUE,
                                                        last.improvement.fes$columns$max$title,
                                                        "))") }, ""));
   reach.best.f.min.fes$mergers <- unlist(c(
+    reach.best.f.min.fes$mergers,
     paste0("  temp1 <- (!is.na(x$", .col.n.reach.best.f.min.runs,
            ")) & (!is.na(x$", .col.n.runs, ")) & (x$",
            .col.n.runs, " == x$", .col.n.reach.best.f.min.runs, ");"),
