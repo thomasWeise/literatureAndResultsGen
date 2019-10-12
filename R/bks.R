@@ -29,6 +29,7 @@ append.bks.to.instance.frame <- function(instances, results,
   .col.reach.best.f.min.time.med <- paste0(.col.reach.best.f.min.time, ".", .col.med.name);
   .col.reach.best.f.min.time.mode <- paste0(.col.reach.best.f.min.time, ".", .col.mode.name);
   .col.reach.best.f.min.time.max <- paste0(.col.reach.best.f.min.time, ".", .col.max.name);
+  .col.last.improvement.time.max <- paste0(.col.last.improvement.time, ".", .col.max.name);
   .col.total.time.max <- paste0(.col.total.time, ".", .col.max.name);
   .col.budget.time <- .col.budget.time;
 
@@ -54,6 +55,7 @@ append.bks.to.instance.frame <- function(instances, results,
                   .col.reach.best.f.min.time.med,
                   .col.reach.best.f.min.time.mode,
                   .col.reach.best.f.min.time.max,
+                  .col.last.improvement.time.max,
                   .col.total.time.max,
                   .col.budget.time) %in% colnames(results)) > 0L
             );
@@ -283,6 +285,20 @@ append.bks.to.instance.frame <- function(instances, results,
     reach.best.f.min.time.max <- NA_integer_;
   }
 
+  if(.col.last.improvement.time.max %in% colnames(results)) {
+    last.improvement.time.max <- unname(unlist(results[.col.last.improvement.time.max]));
+    stopifnot(all(is.na(last.improvement.time.max) | is.finite(last.improvement.time.max)),
+              all(is.na(last.improvement.time.max) | (last.improvement.time.max >= 0L)),
+              all(is.numeric(last.improvement.time.max)),
+              length(last.improvement.time.max) == nrow(results));
+    if(is.time.int) {
+      stopifnot(all(is.integer(last.improvement.time.max)));
+    }
+    have.time <- TRUE;
+  } else {
+    last.improvement.time.max <- NA_integer_;
+  }
+
   if(.col.total.time.max %in% colnames(results)) {
     total.time.max <- unname(unlist(results[.col.total.time.max]));
     stopifnot(all(is.na(total.time.max) | is.finite(total.time.max)),
@@ -324,6 +340,8 @@ append.bks.to.instance.frame <- function(instances, results,
     if(is.na(res) || ((!is.na(res.2)) && (res.2 < res))) { res <- res.2; res <- force(res); }
     res.2 <- reach.best.f.min.time.max[[i]];
     if(is.na(res) || ((!is.na(res.2)) && (res.2 < res))) { res <- res.2; res <- force(res); }
+    res.2 <- last.improvement.time.max[[i]];
+    if(is.na(res) || ((!is.na(res.2)) && (res.2 < res))) { res <- res.2; res <- force(res); }
     res.2 <- total.time.max[[i]];
     if(is.na(res) || ((!is.na(res.2)) && (res.2 < res))) { res <- res.2; res <- force(res); }
     res.2 <- budget.time[[i]];
@@ -339,6 +357,7 @@ append.bks.to.instance.frame <- function(instances, results,
   rm("reach.best.f.min.time.med");
   rm("reach.best.f.min.time.mode");
   rm("reach.best.f.min.time.max");
+  rm("last.improvement.time.max");
   rm("total.time.max");
   rm("budget.time");
 
