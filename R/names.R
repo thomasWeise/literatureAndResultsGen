@@ -23,6 +23,9 @@
 .col.inst.bks <- "inst.bks";
 .col.inst.bks.ref <- "inst.bks.ref";
 
+.col.inst.bks.time <- "inst.bks.time";
+.col.inst.bks.time.ref <- "inst.bks.time.ref";
+
 .col.reach.best.f.min.time <- paste0("reach.best.f.", .col.min.name, ".time");
 .col.reach.best.f.min.fes <- paste0("reach.best.f.", .col.min.name, ".fes");
 .col.n.reach.best.f.min.runs <- paste0("reach.best.f.", .col.min.name, ".runs");

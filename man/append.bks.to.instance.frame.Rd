@@ -6,7 +6,7 @@
   Literature}
 \usage{
 append.bks.to.instance.frame(instances, results,
-  are.objective.values.ints = TRUE)
+  are.objective.values.ints = TRUE, is.time.int = TRUE)
 }
 \arguments{
 \item{instances}{the instance frame}
@@ -14,6 +14,8 @@ append.bks.to.instance.frame(instances, results,
 \item{results}{the results data frame}
 
 \item{are.objective.values.ints}{are the objective values integers?}
+
+\item{is.time.int}{are time values integers?}
 }
 \value{
 the expanded instance frame
