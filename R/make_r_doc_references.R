@@ -49,7 +49,7 @@ make.r.doc.references <- function(refs, bibliography, logger=NULL,
                                   between.two.lines="#'",
                                   after.first.line="#'",
                                   sort=TRUE) {
-  return(make.references.text(refs=refs,
+  text <- (make.references.text(refs=refs,
                               bibliography=bibliography,
                               logger=logger,
                               subst.doi=subst.doi,
@@ -64,4 +64,25 @@ make.r.doc.references <- function(refs, bibliography, logger=NULL,
                               between.two.lines=between.two.lines,
                               after.first.line=after.first.line,
                               sort=sort));
+  text <- force(text);
+  text <- do.call(force, list(text));
+
+# primitive attempt to fix "%" in urls
+  n.chars.new <- sum(nchar(text));
+  while(TRUE) {
+    repl <- "#_\n,\n,";
+    text <- gsub("\\%", repl, text, fixed=TRUE);
+    text <- gsub("(\\{.*)%(.*\\})", "\\1\\\\%\\2", text, fixed=FALSE);
+    text <- gsub(repl, "\\%", text, fixed=TRUE);
+    text <- force(text);
+    text <- do.call(force, list(text));
+    n.chars.old <- n.chars.new;
+    n.chars.new <- sum(nchar(text));
+    stopifnot(n.chars.new >= n.chars.old);
+    if(n.chars.new == n.chars.old) { break; }
+  }
+
+  text <- force(text);
+  text <- do.call(force, list(text));
+  return(text);
 }
